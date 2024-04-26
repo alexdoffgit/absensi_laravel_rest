@@ -9,6 +9,7 @@ use DateInterval;
 
 class Karyawan implements KI
 {
+    // TODO: tambahkan filter berapa banyak yang harus aku ambil, gimana kalau take(1000) untuk pengambilan data awal dan belum di filter?
     public function getPresensi($userId)
     {
         // // ambil data dari database
