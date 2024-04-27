@@ -18,4 +18,13 @@ class Kehadiran extends Controller
 
         return response()->json($resp);
     }
+
+    public function getAbsensi(Request $request, $id)
+    {
+        $resp = [
+            'data' => $this->karyawan->getAbsensi($id)
+        ];
+
+        return response()->json($resp);
+    }
 }

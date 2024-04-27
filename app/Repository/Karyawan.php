@@ -67,4 +67,34 @@ class Karyawan implements KI
         // return ['datang' => $datang, 'pulang' => $pulang];
         return $result;
     }
+
+    // TODO: tambahkan filter berapa banyak yang aku ambil
+    // take(1000) untuk default, aku ngga tahu, maksudnya aku pingin paginasi tapi aku belum tahu implementasinya gimana
+    public function getAbsensi($userId) {
+        $queryResult = DB::table('user_speday')
+                    ->join('leaveclass', 'user_speday.DATEID', '=', 'leaveclass.LEAVEID')
+                    ->where('user_speday.USERID', '=', $userId)
+                    ->select('user_speday.STARTSPECDAY', 'user_speday.ENDSPECDAY', 'leaveclass.LEAVENAME', 'user_speday.DATE')
+                    ->take(50)
+                    ->get();
+        
+        $transfomedQueryResults = [];
+        foreach ($queryResult as $qr) {
+            $temp = [];
+            $datetimeMasuk = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $qr->STARTSPECDAY);
+            $datetimePulang = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $qr->ENDSPECDAY);
+            $date = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $qr->DATE);
+            
+            $temp['jam_masuk'] = $datetimeMasuk->format('H:i');
+            $temp['jam_pulang'] = $datetimePulang->format('H:i');
+            $temp['tanggal'] = $date->format('Y-m-d');
+            
+            $temp['tipe_absen'] = $qr->LEAVENAME;
+            $transfomedQueryResults[] = $temp;
+        }
+
+
+
+        return $transfomedQueryResults;
+    }
 }
