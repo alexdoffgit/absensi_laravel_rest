@@ -97,4 +97,10 @@ class Karyawan implements KI
 
         return $transfomedQueryResults;
     }
+
+    public function getAtasanByKaryawanId($karyawanId)
+    {
+        $jabatan = DB::table('jabatan')->select('atasan_id')->where('user_id', '=', $karyawanId)->first();
+        return $jabatan->atasan_id;
+    }
 }

@@ -6,4 +6,5 @@ interface Karyawan
 {
     public function getPresensi($userId);
     public function getAbsensi($userId);
+    public function getAtasanByKaryawanId($karyawanId);
 }
