@@ -15,4 +15,5 @@ Route::controller(Kehadiran::class)->prefix('karyawan')
         Route::get('/kehadiran/absensi/{id}', 'getAbsensi');
     });
 
-Route::post('/{karyawanName}/pengajuan-izin', [PengajuanIzin::class, 'create']);
+Route::post('/{karyawanname}/pengajuan-izin', [PengajuanIzin::class, 'create']);
+Route::put('/{atasanid}/atasan/daftar-izin/accept-reject/{listizinid}', [PengajuanIzin::class, 'persetujuanIzin']);

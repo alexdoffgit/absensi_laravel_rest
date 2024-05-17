@@ -10,7 +10,7 @@ class PengajuanIzin extends Controller
 {
     public function __construct(private IPengajuanIzin $store) { }
 
-    public function create(Request $request, string $karyawanName) {
+    public function create(Request $request, string $karyawanname) {
         $tanggalPengajuan = $request->input("tanggal_pengajuan");
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
@@ -18,7 +18,7 @@ class PengajuanIzin extends Controller
         $tipeIzin = intval($request->input('tipe_izin'));
         $alasan = $request->input('alasan');
 
-        $karyawan = DB::table('userinfo')->select('USERID')->where('Name', '=', $karyawanName)->first();
+        $karyawan = DB::table('userinfo')->select('USERID')->where('Name', '=', $karyawanname)->first();
 
         $internalData = [
             'tanggal_pengajuan' => $tanggalPengajuan,
@@ -30,5 +30,11 @@ class PengajuanIzin extends Controller
         ];
 
         $isSuccess = $this->store->create($karyawan->USERID, $internalData);
+    }
+
+    public function persetujuanIzin(Request $request, string $atasanid, string $listizinid)
+    {
+        $status = intval($request->input('accrej'));
+        $this->store->persetujuanIzin($status, intval($atasanid), intval($listizinid));
     }
 }

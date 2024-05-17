@@ -51,24 +51,19 @@ path:
                 status: string
               - hrd: string
                 status: string
-  /{id}/atasan/daftar-izin/accept-reject/{karyawanid}:
+  /{atasanid}/atasan/daftar-izin/accept-reject/{listizinid}:
     method: put
     response:
       success:
-        code: 200
-        body-type: 
-          - nama_karyawan: string
-            department: string
-            jabatan: string
-            tanggal_pengajuan: string
-            tanggal_awal: string
-            tanggal_akhir: string
-            tipe_izin: [int, string]
-            persetujuan:
-              - atasan: string
-                status: string
-              - hrd: string
-                status: string
+        success:
+          http-code: 200
+        fail:
+          - http-code: 400
+            body-type:
+              message: string
+          - http-code: 500
+            body-type:
+              message: string
   /{id}/hrd/daftar-izin:
     method: get
     response:

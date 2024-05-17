@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class PengajuanIzinRequestTest extends TestCase
 {
-    public function test_it_accepts_form_data_without_file_input(): void
+    public function it_accepts_form_data_without_file_input(): void
     {
         $url = '/api/PONIDI/pengajuan-izin';
         $formData = [
@@ -21,6 +21,17 @@ class PengajuanIzinRequestTest extends TestCase
         ];
         
         $response = $this->post($url, $formData);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_it_update_persetujuan_izin()
+    {
+        $url = '/api/40/atasan/daftar-izin/accept-reject/1';
+        $formData = [
+            'accrej' => 2
+        ];
+        $response = $this->put($url, $formData);
 
         $response->assertStatus(200);
     }

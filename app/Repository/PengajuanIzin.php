@@ -20,4 +20,14 @@ class PengajuanIzin implements PI
 
         return DB::table('absensi')->insert($tableData);
     }
+
+    public function persetujuanIzin($status, $atasanid, $listizinid)
+    {
+        DB::table('list_atasan_pengajuan_izin')
+            ->where('id', '=', $listizinid)
+            ->where('atasan_id', '=', $atasanid)
+            ->update([
+                'status_izin' => $status
+            ]);
+    }
 }
