@@ -10,6 +10,37 @@ class PengajuanIzin extends Controller
 {
     public function __construct(private IPengajuanIzin $store) { }
 
+    public function createView(Request $request, $karyawanid) {
+
+        return view('pengajuan-izin', [
+            'karyawanId' => $karyawanid,
+            'semuaIzin' => $this->store->tipeIzin(),
+            'semuaAtasan' => $this->store->getAtasanByKaryawanId($karyawanid)
+        ]);
+    }
+
+    public function createWeb(Request $request, $karyawanid) {
+        $data = $request->validate([
+            'tanggal_pengajuan' => 'required|date_format:Y-m-d',
+            'mulai_izin' => 'required|date_format:Y-m-d',
+            'selesai_izin' => 'required|date_format:Y-m-d',
+            'atasan' => 'numeric',
+            'izin' => 'numeric',
+            'alasan' => 'nullable'
+        ]);
+
+        $inDatabase = [
+            'tanggal_pengajuan' => $data['tanggal_pengajuan'],
+            'tanggal_mulai' => $data['mulai_izin'],
+            'tanggal_selesai' => $data['selesai_izin'],
+            'atasan_id' => $data['atasan'],
+            'tipe_izin' => $data['izin'],
+            'alasan' => $data['alasan'],
+        ];
+        
+        $this->store->create(intval($karyawanid), $inDatabase);
+    }
+
     public function create(Request $request, string $karyawanname) {
         $tanggalPengajuan = $request->input("tanggal_pengajuan");
         $tanggalMulai = $request->input('tanggal_mulai');
