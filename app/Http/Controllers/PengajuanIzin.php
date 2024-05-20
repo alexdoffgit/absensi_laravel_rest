@@ -39,6 +39,8 @@ class PengajuanIzin extends Controller
         ];
         
         $this->store->create(intval($karyawanid), $inDatabase);
+
+        return redirect()->back();
     }
 
     public function create(Request $request, string $karyawanname) {
