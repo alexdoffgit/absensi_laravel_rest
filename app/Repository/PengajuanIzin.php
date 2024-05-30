@@ -28,7 +28,6 @@ class PengajuanIzin implements PI
             foreach ($listAtasan as $value) {
                 $satuPenyetuju = [
                     'absensi_id' => $absensiId,
-                    'karyawan_id' => $karyawanId,
                     'penanggungjawab_id' => $value,
                     'tanggal_pembuatan' => $tableData['tanggal_pengajuan']
                 ];
@@ -36,6 +35,18 @@ class PengajuanIzin implements PI
                 $dataPenyetujuAbsen[] = $satuPenyetuju;
             }
     
+            $hrId = 159;
+            $userinfoHR = DB::table('userinfo')
+                ->select('USERID')
+                ->where('DEFAULTDEPTID', '=', $hrId)
+                ->first();
+            $hrPenyetujuAbsen = [
+                'absensi_id' => $absensiId,
+                'penanggungjawab_id' => $userinfoHR->USERID,
+                'tanggal_pembuatan' => $tableData['tanggal_pengajuan']
+            ];
+            $dataPenyetujuAbsen[] = $hrPenyetujuAbsen;
+
             DB::table('penyetuju_absensi')->insert($dataPenyetujuAbsen);
         });
 

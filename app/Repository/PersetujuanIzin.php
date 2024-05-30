@@ -48,13 +48,13 @@ class PersetujuanIzin implements PI
         return $absensi;
     }
 
-    public function acceptOrReject($persetujuanId, $atasanId, $option)
+    public function acceptOrReject($persetujuanId, $penanggungJawabId, $option)
     {
         $tanggalUpdate = new DateTimeImmutable();
 
         DB::table('penyetuju_absensi')
             ->where('id', '=', $persetujuanId)
-            ->where('penanggungjawab_id', '=', $atasanId)
+            ->where('penanggungjawab_id', '=', $penanggungJawabId)
             ->update([
                 'status' => $option,
                 'tanggal_update' => $tanggalUpdate
