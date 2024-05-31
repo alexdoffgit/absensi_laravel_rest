@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
 
+// TODO: remove this, it's a temp class
 class Dashboard extends Controller
 {
     public function dashboardView(Request $request, $uid) 
