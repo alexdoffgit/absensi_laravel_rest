@@ -13,6 +13,10 @@ use App\Repository\PengajuanIzin as PR;
 use App\Interfaces\PersetujuanIzin as PRIZI;
 use App\Repository\PersetujuanIzin as PRIZR;
 
+use App\Interfaces\Authentication as AUI;
+use App\Repository\Authentication as AUR;
+
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -23,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(KI::class, KR::class);
         $this->app->bind(PI::class, PR::class);
         $this->app->bind(PRIZI::class, PRIZR::class);
+        $this->app->bind(AUI::class, AUR::class);
     }
 
     /**
