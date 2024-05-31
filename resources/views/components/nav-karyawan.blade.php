@@ -1,6 +1,6 @@
 <style>
     .component-nav-body {
-        height: 100vh;
+        height: 100%;
         background-color: #291D1D;
     }
     .component-logo {
@@ -34,10 +34,10 @@
     <nav>
         <ul>
             <li>
-                <a href="#">Kehadiran</a>
+                <a href="{{ url("{$karyawanId}/kehadiran") }}">Kehadiran</a>
             </li>
             <li>
-                <a href="{{url("{$karyawanId}/pengajuan-izin")}}">Izin</a>
+                <a href="{{ url("{$karyawanId}/pengajuan-izin") }}">Izin</a>
             </li>
             <li>
                 <a href="#">Jadwal</a>

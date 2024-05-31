@@ -43,7 +43,7 @@
     <nav>
         <ul>
             <li>
-                <a href="#">Kehadiran</a>
+                <a href="{{ url("{$karyawanId}/kehadiran") }}">Kehadiran</a>
             </li>
             <li>
                 <div class="component-izin-wrapper">
