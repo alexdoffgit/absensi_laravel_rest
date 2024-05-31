@@ -19,7 +19,7 @@
 <body>
     <div class="simple-container border border-dark rounded">
         <h1>Pengajuan Izin</h1>
-        <form action="/{{$karyawanId}}" method="POST">
+        <form action="/{{$karyawanId}}/pengajuan-izin" method="POST">
             @csrf
             <div class="mb-3 mt-3">
                 <label for="tanggal_pengajuan" class="form-label">Tanggal Pengajuan</label>
