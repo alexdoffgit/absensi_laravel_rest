@@ -25,7 +25,7 @@ class AuthController extends Controller
         if (empty($uid)) {
             return redirect()->back();
         } else {
-            return redirect(url("/{$uid}"));
+            return redirect(url("/{$uid}/kehadiran"));
         }
     }
 }
