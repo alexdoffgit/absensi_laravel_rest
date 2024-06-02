@@ -29,20 +29,62 @@
     .formbox > form button {
         margin-top: 2em;
     }
+    #toggle-password {
+        cursor: pointer;
+    }
 </style>
 <body>
+    @if (session('invalid'))    
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            Invalid Credentials
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="simple-container">
         <div class="formbox">
             <h1>Login</h1>
-            <form action="/login" method="POST">
+            <form action="/login" method="POST" class="row">
                 @csrf
-                <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" class="form-control">
-                <label for="passwd" class="form-label">Password</label>
-                <input type="password" name="passwd" id="passwd" class="form-control">
-                <button class="btn btn-primary">Login</button>
+                <div class="col-12">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
+                </div>
+                <div class="col-12">
+                    <label for="passwd" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" name="passwd" id="passwd" class="form-control" required>
+                        <span class="input-group-text" id="toggle-password">
+                            <i class="bi bi-eye-fill" id="password-icon"></i>
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-primary col-2">Login</button>
+                </div>
             </form>
         </div>
     </div>
 </body>
+<script type="module">
+    $(function() {
+        const passwordShowIcon = "bi bi-eye-fill";
+        const passwordHideIcon = "bi bi-eye-slash-fill";
+        let showPassword = false;
+
+        $("#toggle-password").click(function() {
+            showPassword = !showPassword;
+            
+            if(showPassword) {
+                $("#password-icon").removeClass(passwordShowIcon);
+                $("#password-icon").addClass(passwordHideIcon);
+                $("#passwd").attr("type", "text");
+            } else {
+                $("#password-icon").removeClass(passwordHideIcon);
+                $("#password-icon").addClass(passwordShowIcon);
+                $("#passwd").attr("type", "password");
+            }
+        })
+
+    });
+</script>
 </html>

@@ -23,7 +23,7 @@ class AuthController extends Controller
         $uid = $this->au->verifyUser($formdata['username'], $formdata['passwd']);
 
         if (empty($uid)) {
-            return redirect()->back();
+            return back()->with('invalid', true);
         } else {
             return redirect(url("/{$uid}/kehadiran"));
         }
