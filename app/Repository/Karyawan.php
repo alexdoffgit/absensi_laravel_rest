@@ -106,4 +106,28 @@ class Karyawan implements KI
         $jabatan = DB::table('jabatan')->select('atasan_id')->where('user_id', '=', $karyawanId)->first();
         return $jabatan->atasan_id;
     }
+
+    public function isLowestDepartment($deptId)
+    {
+        $departmentTable = DB::table('department')
+            ->where('SUPDEPTID', '=', $deptId)
+            ->select('DEPTID')
+            ->first();
+
+        return empty($departmentTable);
+    }
+
+    public function isHighestDepartment($deptId)
+    {
+        $departmentTable = DB::table('department')
+            ->where('DEPTID', '=', $deptId)
+            ->select(['SUPDEPTID'])
+            ->first();
+        
+        if(empty($departmentTable)) {
+            throw new \Exception("No department with id {$deptId}");
+        }
+
+        return $departmentTable->SUPDEPTID == 0;
+    }
 }
