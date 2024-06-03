@@ -62,7 +62,8 @@ class PersetujuanIzin implements PI
                 'penyetuju_absensi.absensi_id',
                 'absensi.tanggal_mulai',
                 'absensi.tanggal_selesai',
-                'penyetuju_absensi.penanggungjawab_id'
+                'penyetuju_absensi.penanggungjawab_id',
+                'penyetuju_absensi.status'
             ])
             ->where('penyetuju_absensi.penanggungjawab_id', '=', $userId)
             ->get();
@@ -78,6 +79,7 @@ class PersetujuanIzin implements PI
             $temp['tanggal_selesai'] = $absensiRow->tanggal_selesai;
             $temp['absensi_id'] = $absensiRow->absensi_id;
             $temp['penanggungjawab_id'] = $absensiRow->penanggungjawab_id;
+            $temp['status'] = $absensiRow->status;
 
             $absensi[] = $temp;
         }
