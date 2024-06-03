@@ -22,8 +22,6 @@ class Perizinan extends Controller
     {
         $data = $this->store->permitDetail($id, $absensiid, $penanggungjawabid);
 
-        // dd($data);
-
         return view('atasan.permit-detail', [
             'permit' => $data, 
             'penanggungJawabId' => $penanggungjawabid,
