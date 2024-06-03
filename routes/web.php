@@ -19,7 +19,9 @@ Route::get('/{uid}/kehadiran', [Kehadiran::class, 'index']);
 Route::get('/{uid}/pengajuan-izin', [PengajuanIzin::class, 'createView']);
 Route::post('/{uid}/pengajuan-izin', [PengajuanIzin::class, 'createWeb']);
 
-Route::get('/{atasanid}/atasan/daftar-izin', [AtasanIzin::class, 'daftarIzin']);
+Route::get('/{atasanid}/atasan/permit-summaries', [AtasanIzin::class, 'permitSummaries']);
+Route::get('{id}/atasan/{absensiid}/{penanggungjawabid}', [AtasanIzin::class, 'permitDetail']);
+
 Route::get('/{atasanid}/atasan/{id}/{option}', [AtasanIzin::class, 'acceptOrReject']);
 
 Route::get('/{hrid}/hr/daftar-izin', [HRIzin::class, 'daftarIzin']);
