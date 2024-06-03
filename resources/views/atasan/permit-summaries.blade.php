@@ -83,6 +83,7 @@
                 </thead>
                 <tbody>
                     @foreach ($semuaIzin as $data)
+                        @if($data['status'] == 'pending')
                         <tr>
                             <td>{{ $data['nama_karyawan'] }}</td>
                             <td>{{ $data['tipe_izin'] }}</td>
@@ -91,13 +92,8 @@
                             <td>
                                 <a href="{{url("/{$data['id']}/atasan/{$data['absensi_id']}/{$data['penanggungjawab_id']}")}}">Halaman Detail</a>
                             </td>
-                            {{-- <td>
-                                <div class="accept-reject">
-                                    <a class="accept" href='{{ url("/{$atasanId}/atasan/{$data['id']}/accept") }}'>Accept</a>
-                                    <a class="reject" href='{{ url("/{$atasanId}/atasan/{$data['id']}/reject") }}'>Reject</a>
-                                </div>
-                            </td> --}}
                         </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>
