@@ -71,40 +71,29 @@
             <button class="btn btn-primary">Filter Ini</button>
         </div>
         <div class="table-overflow-wrapper">
-            <table style="width:160%">
+            <table style="width: 100%">
                 <thead>
                     <tr>
                         <th>Nama Karyawan</th>
-                        <th>Department</th>
-                        <th>Jabatan</th>
                         <th>Tipe Izin</th>
-                        <th>Tanggal Pengajuan Izin</th>
                         <th>Tanggal Awal Izin</th>
                         <th>Tanggal Akhir Izin</th>
-                        <th>Alasan Izin</th>
-                        <th>Dokumen Pendukung</th>
-                        <th>Persetujuan</th>
+                        <th>Detail</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($semuaIzin as $data)
+                        @if($data['status'] == 'pending')
                         <tr>
                             <td>{{ $data['nama_karyawan'] }}</td>
-                            <td>{{ $data['department'] }}</td>
-                            <td>{{ $data['jabatan'] }}</td>
                             <td>{{ $data['tipe_izin'] }}</td>
-                            <td>{{ $data['tanggal_pengajuan'] }}</td>
                             <td>{{ $data['tanggal_mulai'] }}</td>
                             <td>{{ $data['tanggal_selesai'] }}</td>
-                            <td>{{ $data['alasan'] }}</td>
-                            <td> </td>
                             <td>
-                                <div class="accept-reject">
-                                    <a class="accept" href='{{ url("/{$hrId}/hr/{$data['id']}/accept") }}'>Accept</a>
-                                    <a class="reject" href='{{ url("/{$hrId}/hr/{$data['id']}/reject") }}'>Reject</a>
-                                </div>
+                                <a href="{{url("/{$data['id']}/hr/{$data['absensi_id']}/{$data['penanggungjawab_id']}")}}">Halaman Detail</a>
                             </td>
                         </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>

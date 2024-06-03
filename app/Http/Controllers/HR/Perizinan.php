@@ -10,11 +10,22 @@ class Perizinan extends Controller
 {
     public function __construct(private PersetujuanIzin $store) {}
 
-    public function daftarIzin(Request $request, $hrid)
+    public function permitSummaries(Request $request, $hrid)
     {
-        $semuaIzin = $this->store->daftarIzin(intval($hrid));
+        $semuaIzin = $this->store->permitSummaries(intval($hrid));
 
-        return view('hr.daftar-izin', ['semuaIzin' => $semuaIzin, 'hrId' => $hrid]);
+        return view('hr.permit-summaries', ['semuaIzin' => $semuaIzin, 'hrId' => $hrid]);
+    }
+
+    public function permitDetail(Request $request, $id, $absensiid, $penanggungjawabid)
+    {
+        $data = $this->store->permitDetail($id, $absensiid, $penanggungjawabid);
+
+        return view('hr.permit-detail', [
+            'permit' => $data, 
+            'penanggungJawabId' => $penanggungjawabid,
+            'id' => $id
+        ]);
     }
 
     public function acceptOrReject(Request $request, $hrid, $id, $option) {
