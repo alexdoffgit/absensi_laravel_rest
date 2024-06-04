@@ -53,7 +53,7 @@
                             <a href="#" id="component-link-pengajuan-izin">Pengajuan Izin</a>
                         </div>
                         <div>
-                            <a href="{{url("/{$karyawanId}/hr/daftar-izin")}}" id="component-link-persetujuan-izin">Persetujuan Izin</a>
+                            <a href="{{url("/{$karyawanId}/hr/permit-summaries")}}" id="component-link-persetujuan-izin">Persetujuan Izin</a>
                         </div>
                     </div>
                 </div>
