@@ -11,6 +11,8 @@ use App\Http\Controllers\Kehadiran;
 Route::get('/', [AuthController::class, 'loginView']);
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'registerView']);
+Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/{uid}', [Dashboard::class, 'dashboardView']);
 
@@ -20,9 +22,9 @@ Route::get('/{uid}/pengajuan-izin', [PengajuanIzin::class, 'createView']);
 Route::post('/{uid}/pengajuan-izin', [PengajuanIzin::class, 'createWeb']);
 
 Route::get('/{atasanid}/atasan/permit-summaries', [AtasanIzin::class, 'permitSummaries']);
-Route::get('{id}/atasan/{absensiid}/{penanggungjawabid}', [AtasanIzin::class, 'permitDetail']);
-
+Route::get('/{id}/atasan/{absensiid}/{penanggungjawabid}', [AtasanIzin::class, 'permitDetail']);
 Route::get('/{atasanid}/atasan/{id}/{option}', [AtasanIzin::class, 'acceptOrReject']);
 
-Route::get('/{hrid}/hr/daftar-izin', [HRIzin::class, 'daftarIzin']);
+Route::get('/{hrid}/hr/permit-summaries', [HRIzin::class, 'permitSummaries']);
+Route::get('/{id}/hr/{absensiid}/{penanggungjawabid}', [HRIzin::class, 'permitDetail']);
 Route::get('/{hrid}/hr/{id}/{option}', [HRIzin::class, 'acceptOrReject']);
