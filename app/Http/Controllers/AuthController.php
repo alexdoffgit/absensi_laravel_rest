@@ -14,7 +14,8 @@ class AuthController extends Controller
         return view('login');
     }
 
-    public function login(Request $request) {
+    public function login(Request $request) 
+    {
         $formdata = $request->validate([
             'username' => 'required',
             'passwd' => 'required'
@@ -27,5 +28,22 @@ class AuthController extends Controller
         } else {
             return redirect(url("/{$uid}/kehadiran"));
         }
+    }
+
+    public function registerView() 
+    {
+        return view('register');
+    }
+
+    public function register(Request $request)
+    {
+        $formdata = $request->validate([
+            'username' => 'required',
+            'passwd' => 'required'
+        ]);
+
+        $uid = $this->au->register($formdata['username'], $formdata['passwd']);
+
+        return redirect(url("/{$uid}/kehadiran"));
     }
 }

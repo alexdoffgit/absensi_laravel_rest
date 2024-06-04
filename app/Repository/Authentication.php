@@ -17,4 +17,12 @@ class Authentication implements IAuth
 
         return empty($userinfoTable) ? null:  $userinfoTable->USERID;
     }
+
+    // TODO: not use plain text to store password
+    // TODO: rehash the password in db
+    public function register($username, $textPassword)
+    {
+        $id = DB::table('userinfo')->insertGetId(['Name' => $username, 'PASSWORD' => $textPassword]);
+        return $id;
+    }
 }
