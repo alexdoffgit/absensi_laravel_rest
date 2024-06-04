@@ -51,7 +51,7 @@
             @elseif ($position == 'hr')
                 <x-nav-hr :$karyawanId />
             @else
-
+                <x-nav-karyawan :$karyawanId />
             @endif
         </div>
         <div class="content-container">
