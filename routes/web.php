@@ -31,4 +31,5 @@ Route::get('/{hrid}/hr/permit-summaries', [HRIzin::class, 'permitSummaries']);
 Route::get('/{id}/hr/{absensiid}/{penanggungjawabid}', [HRIzin::class, 'permitDetail']);
 Route::get('/{hrid}/hr/{id}/{option}', [HRIzin::class, 'acceptOrReject']);
 
-Route::get('/{uid}/permit-tracking', [PermitTrackingController::class, 'index']);
+Route::get('/{uid}/permit-tracking', [PermitTrackingController::class, 'permitSummary']);
+Route::get('{absentid}/{uid}/permit-detail', [PermitTrackingController::class, 'permitDetail']);

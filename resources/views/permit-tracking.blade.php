@@ -23,7 +23,6 @@
         .pseudo-padding {
             margin: 3rem 0;
             grid-column: 2 / 10;
-            dis
         }
         .leave-card {
             margin-top: 1.5rem;
@@ -105,7 +104,7 @@
                                 <td>{{ $row['tipe_izin'] }}</td>
                                 <td>{{ $row['tanggal_pengajuan'] }}</td>
                                 <td>
-                                    <a href="{{ url("/{$karyawanId}/{$row['id']}/tracking-detail") }}">
+                                    <a href="{{ url("/{$row['id']}/{$karyawanId}/permit-detail") }}">
                                         Link To Detail
                                     </a>
                                 </td>
