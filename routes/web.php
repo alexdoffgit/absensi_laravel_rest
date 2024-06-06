@@ -7,6 +7,8 @@ use App\Http\Controllers\HR\Perizinan as HRIzin;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PengajuanIzin;
 use App\Http\Controllers\Kehadiran;
+use App\Http\Controllers\PermitTracking;
+use App\Http\Controllers\PermitTrackingController;
 
 Route::get('/', [AuthController::class, 'loginView']);
 
@@ -28,3 +30,5 @@ Route::get('/{atasanid}/atasan/{id}/{option}', [AtasanIzin::class, 'acceptOrReje
 Route::get('/{hrid}/hr/permit-summaries', [HRIzin::class, 'permitSummaries']);
 Route::get('/{id}/hr/{absensiid}/{penanggungjawabid}', [HRIzin::class, 'permitDetail']);
 Route::get('/{hrid}/hr/{id}/{option}', [HRIzin::class, 'acceptOrReject']);
+
+Route::get('/{uid}/permit-tracking', [PermitTrackingController::class, 'index']);

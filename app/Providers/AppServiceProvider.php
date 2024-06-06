@@ -16,6 +16,8 @@ use App\Repository\PersetujuanIzin as PRIZR;
 use App\Interfaces\Authentication as AUI;
 use App\Repository\Authentication as AUR;
 
+use App\Interfaces\PermitTracking as PTI;
+use App\Repository\PermitTracking as PTR;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PI::class, PR::class);
         $this->app->bind(PRIZI::class, PRIZR::class);
         $this->app->bind(AUI::class, AUR::class);
+        $this->app->bind(PTI::class, PTR::class);
     }
 
     /**
