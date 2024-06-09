@@ -9,16 +9,51 @@ use DateInterval;
 
 class Karyawan implements KI
 {
+    /**
+     * @return array{start: DateTimeImmutable, end: DateTimeImmutable}
+     */
+    private function getCurrentWeekRange()
+    {
+        $today = new DateTimeImmutable();
+        // $today = DateTimeImmutable::createFromFormat('Y-m-d', '2024-01-17'); // temp date
+        
+        $dayOfTheWeek = $today->format('N') - 1;
+
+        $startOfTheWeek = $today->modify('-' . $dayOfTheWeek . 'days');
+        $endOfTheWeek = $startOfTheWeek->modify("+6 days");
+
+        $startOfTheWeekStr = $startOfTheWeek->format('Y-m-d');
+        $endOfTheWeekStr = $endOfTheWeek->format('Y-m-d');
+
+        $startOfTheWeekDateTime = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', "{$startOfTheWeekStr} 00:00:00");
+        $endOfTheWeekDateTime = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', "{$endOfTheWeekStr} 23:59:59");
+        return [
+            'start' => $startOfTheWeekDateTime,
+            'end' => $endOfTheWeekDateTime
+        ];
+    }
+
+
     // TODO: tambahkan filter berapa banyak yang harus aku ambil, gimana kalau take(1000) untuk pengambilan data awal dan belum di filter?
-    public function getPresensi($userId)
+    public function getPresensi($userId, $week)
     {
         // // ambil data dari database
-        $queryResult = DB::table('checkinout')
-                        ->where('USERID', $userId)
-                        ->get(['CHECKTIME', 'CHECKTYPE'])
-                        ->take(50)
-                        ->toArray();
+        if (!empty($week) && $week == true) {
+            $weekRange = $this->getCurrentWeekRange();
+            $queryResult = DB::table('checkinout')
+                ->where('USERID', '=', $userId)
+                ->whereBetween('CHECKTIME', [$weekRange['start'], $weekRange['end']])
+                ->get(['CHECKTIME', 'CHECKTYPE'])
+                ->toArray();
+        } else {
+            $queryResult = DB::table('checkinout')
+                            ->where('USERID', '=', $userId)
+                            ->get(['CHECKTIME', 'CHECKTYPE'])
+                            ->take(50)
+                            ->toArray();
+        }
 
+        
         // // ubah CHECKTIME dari string ke DateTimeImmutable
         $presensi = [];
         for ($i = 0; $i < count($queryResult); $i++) {
@@ -62,9 +97,6 @@ class Karyawan implements KI
             }
         }
 
-        // return $queryResult;
-        // return $presensi;
-        // return ['datang' => $datang, 'pulang' => $pulang];
         return $result;
     }
 
