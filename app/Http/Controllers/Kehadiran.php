@@ -16,7 +16,7 @@ class Kehadiran extends Controller
             ->select('jabatan')
             ->where('userid', '=', intval($uid))
             ->first();
-        $presenceTableData = $this->store->getPresensi(intval($uid));
+        $presenceTableData = $this->store->getPresensi(intval($uid), false);
         $absenceTableData = $this->store->getAbsensi(intval($uid));
 
 
