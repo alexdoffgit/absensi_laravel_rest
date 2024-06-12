@@ -6,18 +6,22 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class NavKaryawan extends Component
+class Layout extends Component
 {
     /**
      * Create a new component instance.
      */
-    public function __construct(public string $uid) {}
+    public function __construct(
+        public string $title,
+        public string $uid,
+        public string $jabatan
+    ) {}
 
     /**
      * Get the view / contents that represent the component.
      */
     public function render(): View|Closure|string
     {
-        return view('components.nav-karyawan');
+        return view('components.layout');
     }
 }

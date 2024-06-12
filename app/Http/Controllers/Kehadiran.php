@@ -24,7 +24,7 @@ class Kehadiran extends Controller
             'presenceTableData' => $presenceTableData,
             'absenceTableData' => $absenceTableData,
             'position' => $positionTableData->jabatan,
-            'karyawanId' => $uid
+            'uid' => $uid
         ]);
     }
 }

@@ -11,10 +11,7 @@ class NavAtasan extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct(public string $karyawanId)
-    {
-        //
-    }
+    public function __construct(public string $uid) {}
 
     /**
      * Get the view / contents that represent the component.
