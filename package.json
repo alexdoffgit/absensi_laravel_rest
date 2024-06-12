@@ -11,6 +11,9 @@
         "vite": "^5.0"
     },
     "dependencies": {
+        "@fullcalendar/bootstrap5": "^6.1.14",
+        "@fullcalendar/core": "^6.1.14",
+        "@fullcalendar/daygrid": "^6.1.14",
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.11.3",
