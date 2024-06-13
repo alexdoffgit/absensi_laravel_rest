@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Interfaces\Karyawan;
+use App\Interfaces\Kehadiran as IKehadiran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class Kehadiran extends Controller
 {
-    public function __construct(private Karyawan $store) {}
+    public function __construct(private IKehadiran $store) {}
 
     public function index(Request $request, $uid) 
     {
@@ -16,15 +16,17 @@ class Kehadiran extends Controller
             ->select('jabatan')
             ->where('userid', '=', intval($uid))
             ->first();
-        $presenceTableData = $this->store->getPresensi(intval($uid), false);
-        $absenceTableData = $this->store->getAbsensi(intval($uid));
-
+        $this->store->getScheduleByEmployeeIdAndDate($uid, \DateTimeImmutable::createFromFormat('Y-m-d', '2023-12-12'));
 
         return view('kehadiran', [
-            'presenceTableData' => $presenceTableData,
-            'absenceTableData' => $absenceTableData,
             'position' => $positionTableData->jabatan,
             'uid' => $uid
         ]);
+    }
+
+    public function getEventObjects(Request $request, $uid, $yearmonth)
+    {
+        $data = $this->store->getScheduleByEmployeeIdAndDate($uid, \DateTimeImmutable::createFromFormat('Y-m-d', $yearmonth));
+        return response()->json($data);
     }
 }

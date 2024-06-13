@@ -4,7 +4,9 @@
     </div>
     <x-slot:script>
         <script type="module">
+            const calendar = window.absensi.createCalendar("{{ $uid }}")
 
+            calendar.render()
         </script>
     </x-slot>
 </x-layout>
