@@ -9,8 +9,13 @@ use App\Http\Controllers\PengajuanIzin;
 use App\Http\Controllers\Kehadiran;
 use App\Http\Controllers\PermitTracking;
 use App\Http\Controllers\PermitTrackingController;
+use App\Http\Controllers\Test;
 
 Route::get('/', [AuthController::class, 'loginView']);
+
+Route::prefix('test')->group(function() {
+    Route::get('/', [Test::class, 'index']);
+});
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'registerView']);
