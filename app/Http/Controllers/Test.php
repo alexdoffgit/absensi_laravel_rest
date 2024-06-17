@@ -12,5 +12,7 @@ class Test extends Controller
         // select checktime, checktype, userid dalam  5 tahun dari hari ini
         // pisahkan menjadi format date, time start, time end
         
+
+        return view('test', ['jabatan' => 'hr', 'uid' => 3]);
     }
 }
