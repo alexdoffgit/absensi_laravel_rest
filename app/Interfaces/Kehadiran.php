@@ -16,4 +16,5 @@ interface Kehadiran
      * @throws App\Exceptions\EmployeeNotFoundException
      */
     public function getScheduleByEmployeeIdAndDate($uid, $date);
+    public function getAllEmployeePresence();
 }

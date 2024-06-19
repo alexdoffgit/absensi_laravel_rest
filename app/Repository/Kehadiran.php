@@ -6,10 +6,12 @@ use Illuminate\Support\Facades\DB;
 use App\Interfaces\Kehadiran as IKehadiran;
 use App\Exceptions\EmployeeNotFoundException;
 use App\Interfaces\TimeHelper;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class Kehadiran implements IKehadiran
 {
+    private $testDateBack = '2024-01-18';
+    private $testDepartment = 80;
+
     public function __construct(private TimeHelper $time) {}
 
     public function getScheduleByEmployeeIdAndDate($uid, $date)
@@ -73,6 +75,29 @@ class Kehadiran implements IKehadiran
             ]
         */
         return $this->presentDateTransformer($checkinout2, $timeSchedule);
+    }
+
+    public function getAllEmployeePresence()
+    {
+        // $checkInOutTable = DB::table('checkinout')
+        //     ->whereDate('CHECKTIME', '>=', $this->testDateBack)
+        //     ->select(['CHECKTIME', 'USERID', 'CHECKTYPE'])
+        //     ->get()
+        //     ->toArray();
+
+        $checkInOutTable = DB::table('checkinout')
+            ->join('userinfo', 'userinfo.USERID', '=', 'checkinout.USERID')
+            ->join('departments', 'departments.DEPTID', '=', 'userinfo.DEFAULTDEPTID')
+            ->whereDate('CHECKTIME', '=', $this->testDateBack)
+            ->where('departments.DEPTID', '=', $this->testDepartment)
+            ->select(['checkinout.CHECKTIME', 'checkinout.USERID', 'checkinout.CHECKTYPE'])
+            ->toRawSql();
+
+            dd($checkInOutTable);
+        // group based on user
+        $userGrouped = $this->checkInOutGroupByUserId($checkInOutTable);
+        
+        $userFlatDateTime = $this->flattenGroupedCheckInOut($userGrouped);
     }
 
     /**
@@ -153,5 +178,77 @@ class Kehadiran implements IKehadiran
         }
 
         return $result;
+    }
+
+    /**
+     * @param list<object{
+     *   CHECKTIME: string,
+     *   USERID: int,
+     *   CHECKTYPE: string
+     * }> $checkInOutTable
+     * @return array{
+     *   user_id: list<array{
+     *     checktime: \DateTimeImmutable,
+     *     checktype: string
+     *   }>
+     * }
+     */
+    private function checkInOutGroupByUserId($checkInOutTable)
+    {
+        $userGroup = [];
+        foreach ($checkInOutTable as $value1) {
+            $userGroup["{$value1->USERID}"] = [];
+        }
+        
+        foreach ($checkInOutTable as $value2) {
+            $userGroup[$value2->USERID][] = [
+                'checktime' => \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $value2->CHECKTIME),
+                'checktype' => $value2->CHECKTYPE
+            ];
+        }
+
+        return $userGroup;
+    }
+
+    /**
+     * @param array{
+     *   user_id: list<array{
+     *     checktime: \DateTimeImmutable,
+     *     checktype: string
+     *   }>
+     * } $userGrouped
+     * @return array{
+     *   user_id: list<array{string, array{
+     *       time_start: \DateTimeImmutable,
+     *       time_end: \DateTimeImmutable
+     *     }
+     *   }>
+     * }
+     */
+    private function flattenGroupedCheckInOut($userGrouped)
+    {
+        $flattened = [];
+        foreach ($userGrouped as $userId => $checkInOutRow) {
+            // date grouping
+            $dateMap = [];
+            foreach ($checkInOutRow as $valueCheckInOut) {
+                $dateMap[$valueCheckInOut['checktime']->format('Y-m-d')] = [];
+            }
+
+            foreach ($checkInOutRow as $valueCheckInOut2) {
+                if($valueCheckInOut2['checktype'] == 'I') {
+                    $dateMap[$valueCheckInOut2['checktime']->format('Y-m-d')]['time_start'] = 
+                        $valueCheckInOut2['checktime'];
+                }
+
+                if($valueCheckInOut2['checktype'] == 'O') {
+                    $dateMap[$valueCheckInOut2['checktime']->format('Y-m-d')]['time_end'] = 
+                        $valueCheckInOut2['checktime'];
+                }
+            }
+
+            $flattened[$userId] = $dateMap;
+        }
+        return $flattened;
     }
 }
