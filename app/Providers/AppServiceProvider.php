@@ -23,8 +23,11 @@ use App\Repository\PermitTracking as PTR;
 use App\Interfaces\TimeHelper as ITH;
 use App\Repository\TimeHelper as RTH;
 
-use App\Repository\Kehadiran as RKE;
 use App\Interfaces\Kehadiran as IKE;
+use App\Repository\Kehadiran as RKE;
+
+use App\Interfaces\Schedule as ISchedule;
+use App\Repository\Schedule as ScheduleRepo;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PTI::class, PTR::class);
         $this->app->bind(ITH::class, RTH::class);
         $this->app->bind(IKE::class, RKE::class);
+        $this->app->bind(ISchedule::class, ScheduleRepo::class);
     }
 
     /**

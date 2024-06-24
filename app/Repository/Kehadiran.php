@@ -6,10 +6,11 @@ use Illuminate\Support\Facades\DB;
 use App\Interfaces\Kehadiran as IKehadiran;
 use App\Exceptions\EmployeeNotFoundException;
 use App\Interfaces\TimeHelper;
+use App\Exceptions\NegativeNumberException;
 
 class Kehadiran implements IKehadiran
 {
-    private $testDateBack = '2024-01-18';
+    private $testDateBack = ['2024-01-11', '2024-01-18'];
     private $testDepartment = 80;
 
     public function __construct(private TimeHelper $time) {}
@@ -77,27 +78,98 @@ class Kehadiran implements IKehadiran
         return $this->presentDateTransformer($checkinout2, $timeSchedule);
     }
 
-    public function getAllEmployeePresence()
+    /**
+     * @param int $deptId
+     * @param array{
+     *   time: 'week'|'month',
+     *   page: int
+     * }|null $options
+     * @return list<object{
+     *   id: int,
+     *   work_date_start: string,
+     *   work_date_end: string,
+     *   checkin: string,
+     *   checkout: string,
+     *   checkin_schedule: string,
+     *   checkout_schedule: string,
+     *   istirahat_start: string|null,
+     *   istirahat_end: string|null,
+     *   istirahat_start_schedule: string|null,
+     *   istirahat_end_schedule: string|null,
+     *   user_id: int
+     * }>
+     * @throws App\Exceptions\DepartmentNotFoundException
+     */
+    public function getPresenceFiltered($deptId, $options)
     {
-        // $checkInOutTable = DB::table('checkinout')
-        //     ->whereDate('CHECKTIME', '>=', $this->testDateBack)
-        //     ->select(['CHECKTIME', 'USERID', 'CHECKTYPE'])
-        //     ->get()
-        //     ->toArray();
+        $presensiCount = DB::table('presensi')->count();
+        if($presensiCount > 0) {
+            DB::table('presensi')->truncate();
+        }
 
-        $checkInOutTable = DB::table('checkinout')
-            ->join('userinfo', 'userinfo.USERID', '=', 'checkinout.USERID')
-            ->join('departments', 'departments.DEPTID', '=', 'userinfo.DEFAULTDEPTID')
-            ->whereDate('CHECKTIME', '=', $this->testDateBack)
-            ->where('departments.DEPTID', '=', $this->testDepartment)
-            ->select(['checkinout.CHECKTIME', 'checkinout.USERID', 'checkinout.CHECKTYPE'])
-            ->toRawSql();
+        $presensi = [];
+        if(!empty($options)) {
 
-            dd($checkInOutTable);
-        // group based on user
-        $userGrouped = $this->checkInOutGroupByUserId($checkInOutTable);
+            if (!isset($options['page'])) {
+                $page = 1;
+            } else {
+                if($options['page'] < 0) {
+                    throw new NegativeNumberException();
+                }
+                $page = $options['page'];
+            }
+
+            if(isset($options['time']) && $options['time'] == 'week') {
+                
+                $dayCalc = 7 * ($page - 1);
+                $modifier = "-{$dayCalc} days";
+                $date = (new \DateTimeImmutable())->modify($modifier);
+                $timeRange = $this->time->getMondayAndSunday($date);
+                $timeRange = [
+                    'first' => \DateTimeImmutable::createFromFormat('Y-m-d', '2024-01-15'),
+                    'last' => \DateTimeImmutable::createFromFormat('Y-m-d', '2024-01-21'),
+                ];
+                $presensi = $this->timeRangeFilter($deptId, $timeRange);
+            }
+
+            if(isset($options['time']) && $options['time'] == 'month') {
+                
+                $dayCalc = $page - 1;
+                $modifier = "-{$dayCalc} month";
+                $date = (new \DateTimeImmutable())->modify($modifier);
+                // dd($date->format('n'));
+                $timeRange = $this->time->getFirstDateAndLastDateOfMonth(intval($date->format('Y')), intval($date->format('n')));
+                $timeRange = [
+                    'first' => \DateTimeImmutable::createFromFormat('Y-m-d', '2023-12-01'),
+                    'last' => \DateTimeImmutable::createFromFormat('Y-m-d', '2023-12-31'),
+                ];
+                $presensi = $this->timeRangeFilter($deptId, $timeRange);
+            }
+
+        } else {
+
+            $page = 1;
+            $dayCalc = 7 * ($page - 1);
+            $modifier = "-{$dayCalc} days";
+            $date = (new \DateTimeImmutable())->modify($modifier);
+            $timeRange = $this->time->getMondayAndSunday($date);
+            $timeRange = [
+                'first' => \DateTimeImmutable::createFromFormat('Y-m-d', '2024-01-15'),
+                'last' => \DateTimeImmutable::createFromFormat('Y-m-d', '2024-01-21'),
+            ];
+            $presensi = $this->timeRangeFilter($deptId, $timeRange);
+
+        }
+
+        $presensi = $this->validPresence($presensi);
+        // dd($presensi);
+
+        DB::table('presensi')->insert($presensi);
         
-        $userFlatDateTime = $this->flattenGroupedCheckInOut($userGrouped);
+        $presensiFromTable = DB::table('presensi')
+            ->get();
+
+        return $presensiFromTable->toArray();
     }
 
     /**
@@ -181,74 +253,178 @@ class Kehadiran implements IKehadiran
     }
 
     /**
-     * @param list<object{
-     *   CHECKTIME: string,
-     *   USERID: int,
-     *   CHECKTYPE: string
-     * }> $checkInOutTable
-     * @return array{
-     *   user_id: list<array{
-     *     checktime: \DateTimeImmutable,
-     *     checktype: string
-     *   }>
-     * }
+     * @param int $deptId
+     * @param array{first: \DateTimeImmutable, last: \DateTimeImmutable} $timeRange
+     * @return list<array{
+     *   id: int,
+     *   work_date_start: string,
+     *   work_date_end: string,
+     *   checkin: string,
+     *   checkin_schedule: string,
+     *   checkout_schedule: string,
+     *   checkout: string,
+     *   istirahat_start: string|null,
+     *   istirahat_end: string|null,
+     *   istirahat_start_schedule: string|null,
+     *   istirahat_end_schedule: string|null,
+     *   user_id: int
+     * }>
      */
-    private function checkInOutGroupByUserId($checkInOutTable)
+    private function timeRangeFilter($deptId, $timeRange) 
     {
-        $userGroup = [];
-        foreach ($checkInOutTable as $value1) {
-            $userGroup["{$value1->USERID}"] = [];
-        }
+        $checkInOutTable = DB::table('checkinout')
+            ->join('userinfo', 'userinfo.USERID', '=', 'checkinout.USERID')
+            ->where('userinfo.DEFAULTDEPTID', '=', $deptId)
+            ->whereDate('checkinout.CHECKTIME', '>=', $timeRange['first'])
+            ->whereDate('checkinout.CHECKTIME', '<=', $timeRange['last'])
+            ->select(['checkinout.USERID', 'checkinout.CHECKTIME', 'checkinout.CHECKTYPE'])
+            ->orderBy('checkinout.CHECKTIME')
+            ->get();
         
-        foreach ($checkInOutTable as $value2) {
-            $userGroup[$value2->USERID][] = [
-                'checktime' => \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $value2->CHECKTIME),
-                'checktype' => $value2->CHECKTYPE
-            ];
+
+        $scheduleTable = DB::table('user_sch')
+            ->join('userinfo', 'userinfo.USERID', '=', 'user_sch.USERID')
+            ->whereDate('COMETIME', '>=', $timeRange['first'])
+            ->whereDate('LEAVETIME', '<=', $timeRange['last'])
+            ->where('userinfo.DEFAULTDEPTID', '=', $deptId)
+            ->select(['user_sch.USERID', 'user_sch.COMETIME', 'user_sch.LEAVETIME', 'user_sch.SCHCLASSID'])
+            ->get();
+        
+        $checkInOutTable = $checkInOutTable->map(function($item, $key) {
+            $item->datestring = explode(' ', $item->CHECKTIME)[0];
+            return $item;
+        });
+
+
+        $scheduleTable = $scheduleTable->map(function($item, $key) {
+            $item->dateStart = explode(' ', $item->COMETIME)[0];
+            $item->dateEnd = explode(' ', $item->LEAVETIME)[0];
+            return $item;
+        });
+
+        
+
+        $userSchedule = [];
+        foreach ($scheduleTable as $i => $scheduleRow) {
+            $datetimeData = $this->searchUserCheckTime(
+                    $checkInOutTable, 
+                    $scheduleRow->USERID,
+                    $scheduleRow->dateStart,
+                    $scheduleRow->dateEnd,
+                    [
+                        'cometime' => $scheduleRow->COMETIME,
+                        'leavetime' => $scheduleRow->LEAVETIME
+                    ]
+                );
+            $userSchedule[] = $datetimeData;
         }
 
-        return $userGroup;
+        return $userSchedule;
     }
 
     /**
+     * @param list<object{
+     *   USERID: int,
+     *   CHECKTIME: string,
+     *   datestring: string
+     * }> $checkInOut
+     * @param int $userId
+     * @param string $dateStart
+     * @param string $dateEnd
      * @param array{
-     *   user_id: list<array{
-     *     checktime: \DateTimeImmutable,
-     *     checktype: string
-     *   }>
-     * } $userGrouped
+     *   cometime: string, 
+     *   leavetime: string,
+     *   username: string,
+     * } $injected
      * @return array{
-     *   user_id: list<array{string, array{
-     *       time_start: \DateTimeImmutable,
-     *       time_end: \DateTimeImmutable
-     *     }
-     *   }>
+     *   id: int,
+     *   work_date_start: string,
+     *   work_date_end: string,
+     *   checkin: string,
+     *   checkout: string,
+     *   checkin_schedule: string,
+     *   checkout_schedule: string,
+     *   istirahat_start: string|null,
+     *   istirahat_end: string|null,
+     *   istirahat_start_schedule: string|null,
+     *   istirahat_end_schedule: string|null,
+     *   user_id: int
      * }
      */
-    private function flattenGroupedCheckInOut($userGrouped)
+    private function searchUserCheckTime($checkInOut, $userId, $dateStart, $dateEnd, $injected)
     {
-        $flattened = [];
-        foreach ($userGrouped as $userId => $checkInOutRow) {
-            // date grouping
-            $dateMap = [];
-            foreach ($checkInOutRow as $valueCheckInOut) {
-                $dateMap[$valueCheckInOut['checktime']->format('Y-m-d')] = [];
-            }
-
-            foreach ($checkInOutRow as $valueCheckInOut2) {
-                if($valueCheckInOut2['checktype'] == 'I') {
-                    $dateMap[$valueCheckInOut2['checktime']->format('Y-m-d')]['time_start'] = 
-                        $valueCheckInOut2['checktime'];
+        $userPresensi = [];
+        foreach ($checkInOut as $valueRow_1) {
+            if(
+                $valueRow_1->USERID == $userId && 
+                $valueRow_1->datestring == $dateStart && 
+                $valueRow_1->CHECKTYPE == 'I') {
+                    $userPresensi['user_id'] = $valueRow_1->USERID;
+                    $userPresensi['checkin'] = $valueRow_1->CHECKTIME;
+                    $userPresensi['checkin_schedule'] = $injected['cometime'];
+                    $userPresensi['checkout_schedule'] = $injected['leavetime'];
+                    $userPresensi['work_date_start'] = $dateStart;
+                    $userPresensi['work_date_end'] = $dateEnd;
+                    $userPresensi['istirahat_start'] = null;
+                    $userPresensi['istirahat_end'] = null;
+                    $userPresensi['istirahat_start_schedule'] = null;
+                    $userPresensi['istirahat_end_schedule'] = null;
                 }
 
-                if($valueCheckInOut2['checktype'] == 'O') {
-                    $dateMap[$valueCheckInOut2['checktime']->format('Y-m-d')]['time_end'] = 
-                        $valueCheckInOut2['checktime'];
+            if(
+                $valueRow_1->USERID == $userId && 
+                $valueRow_1->datestring == $dateEnd && 
+                $valueRow_1->CHECKTYPE == 'O') {
+                    $userPresensi['user_id'] = $valueRow_1->USERID;
+                    $userPresensi['checkout'] = $valueRow_1->CHECKTIME;
+                    $userPresensi['checkin_schedule'] = $injected['cometime'];
+                    $userPresensi['checkout_schedule'] = $injected['leavetime'];
+                    $userPresensi['work_date_start'] = $dateStart;
+                    $userPresensi['work_date_end'] = $dateEnd;
+                    $userPresensi['istirahat_start'] = null;
+                    $userPresensi['istirahat_end'] = null;
+                    $userPresensi['istirahat_start_schedule'] = null;
+                    $userPresensi['istirahat_end_schedule'] = null;
                 }
-            }
-
-            $flattened[$userId] = $dateMap;
         }
-        return $flattened;
+
+        return $userPresensi;
+    }
+
+    /**
+     * @param list<array{
+     *   id: int,
+     *   work_date_start: string,
+     *   work_date_end: string,
+     *   checkin: string,
+     *   checkin_schedule: string,
+     *   checkout_schedule: string,
+     *   checkout: string,
+     *   istirahat_start: string|null,
+     *   istirahat_end: string|null,
+     *   istirahat_start_schedule: string|null,
+     *   istirahat_end_schedule: string|null,
+     *   user_id: int
+     * }> $presenceArr
+     * @return list<array{
+     *   id: int,
+     *   work_date_start: string,
+     *   work_date_end: string,
+     *   checkin: string,
+     *   checkin_schedule: string,
+     *   checkout_schedule: string,
+     *   checkout: string,
+     *   istirahat_start: string|null,
+     *   istirahat_end: string|null,
+     *   istirahat_start_schedule: string|null,
+     *   istirahat_end_schedule: string|null,
+     *   user_id: int
+     * }>
+     */
+    private function validPresence($presenceArr)
+    {
+        return array_filter($presenceArr, function($value) {
+            return count($value) == 11;
+        });
     }
 }
