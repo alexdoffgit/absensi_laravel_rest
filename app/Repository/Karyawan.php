@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Exceptions\EmployeeNotFoundException;
 use App\Interfaces\Karyawan as KI;
 use Illuminate\Support\Facades\DB;
 use DateTimeImmutable;
@@ -139,27 +140,36 @@ class Karyawan implements KI
         return $jabatan->atasan_id;
     }
 
-    public function isLowestDepartment($deptId)
+    /**
+     * @param int $uid
+     * @return 'hr'|'manager'|'staff'
+     * @throws App\Exceptions\EmployeeNotFoundException
+     */
+    public function getRoles($uid)
     {
-        $departmentTable = DB::table('department')
-            ->where('SUPDEPTID', '=', $deptId)
-            ->select('DEPTID')
-            ->first();
-
-        return empty($departmentTable);
-    }
-
-    public function isHighestDepartment($deptId)
-    {
-        $departmentTable = DB::table('department')
-            ->where('DEPTID', '=', $deptId)
-            ->select(['SUPDEPTID'])
+        $departmentFromTable = DB::table('userinfo as u')
+            ->join('departments as d', 'u.DEFAULTDEPTID', '=', 'd.DEPTID')
+            ->join('deptseq as ds', 'd.DEPTID', '=', 'ds.DEPTID')
+            ->where('u.USERID', '=', $uid)
+            ->select(['d.DEPTID', 'ds.DLEVEL'])
             ->first();
         
-        if(empty($departmentTable)) {
-            throw new \Exception("No department with id {$deptId}");
+        $lowestDepartmentLevel = DB::table('deptseq')
+            ->get('DLEVEL')
+            ->max('DLEVEL');
+
+        if(empty($departmentFromTable)) {
+            throw new EmployeeNotFoundException($uid);
         }
 
-        return $departmentTable->SUPDEPTID == 0;
+        if($departmentFromTable->DEPTID == 54) {
+            return 'hr';
+        } else if(
+            $departmentFromTable->DLEVEL >= 1.0 && 
+            $departmentFromTable->DLEVEL < $lowestDepartmentLevel) {
+                return 'manager';
+        } else {
+            return 'staff';
+        }
     }
 }

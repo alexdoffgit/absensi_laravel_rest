@@ -7,6 +7,11 @@ interface Karyawan
     public function getPresensi($userId, $week);
     public function getAbsensi($userId);
     public function getAtasanByKaryawanId($karyawanId);
-    public function isLowestDepartment($deptId);
-    public function isHighestDepartment($deptId);
+    
+    /**
+     * @param int $uid
+     * @return 'hr'|'manager'|'staff'
+     * @throws App\Exceptions\EmployeeNotFoundException
+     */
+    public function getRoles($uid);
 }
