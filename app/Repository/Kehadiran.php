@@ -98,14 +98,10 @@ class Kehadiran implements IKehadiran
      *   istirahat_end_schedule: string|null,
      *   user_id: int
      * }>
-     * @throws App\Exceptions\DepartmentNotFoundException
+     * @throws App\Exceptions\NegativeNumberException
      */
     public function getPresenceFiltered($deptId, $options)
     {
-        $presensiCount = DB::table('presensi')->count();
-        if($presensiCount > 0) {
-            DB::table('presensi')->truncate();
-        }
 
         $presensi = [];
         if(!empty($options)) {
@@ -170,6 +166,96 @@ class Kehadiran implements IKehadiran
             ->get();
 
         return $presensiFromTable->toArray();
+    }
+    
+    /**
+     * @param \DateTimeImmutable $date
+     * @param array{
+     *   deptId: int,
+     *   userId?: int
+     * } $options
+     * @return list<object{
+     *   id: int,
+     *   work_date_start: string,
+     *   work_date_end: string,
+     *   checkin: string,
+     *   checkout: string,
+     *   istirahat_start: string|null,
+     *   istirahat_end: string|null,
+     *   istirahat_start_schedule: string|null,
+     *   istirahat_end_schedule: string|null,
+     *   username: string,
+     *   user_id: int
+     * }>
+     */
+    public function getPresencePerDay($date, $options)
+    {
+        // check if data exist in database
+        $presenceQty = DB::table('presensi')->count();
+
+        if($presenceQty == 0) {
+            // if i ask for certain date, should i get range yesterday
+            $checkInOutTable = DB::table('checkinout as c')
+                ->join('userinfo as u', 'c.USERID', '=', 'u.USERID')
+                ->join('user_sch as us', 'u.USERID', '=', 'us.USERID')
+                ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                ->whereDate('c.CHECKTIME', '=', $date)
+                ->select(['c.USERID', 'c.CHECKTIME', 'c.CHECKTYPE'])
+                ->get();
+    
+            // i don't know if i should use the same cometime and leavetime
+            $userScheduleTable = DB::table('user_sch as us')
+                ->join('userinfo as u', 'us.USERID', '=', 'u.USERID')
+                ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                ->whereDate('us.COMETIME', '=', $date)
+                ->select(['us.USERID', 'us.COMETIME', 'us.LEAVETIME', 'us.SCHCLASSID'])
+                ->get();
+    
+            $checkInOutTable->transform(function($item, $key) {
+                $item->datestring = explode(' ', $item->CHECKTIME)[0];
+                return $item;
+            });
+    
+            $userScheduleTable->transform(function($item, $key) {
+                $item->dateStart = explode(' ', $item->COMETIME)[0];
+                $item->dateEnd = explode(' ', $item->LEAVETIME)[0];
+                return $item;
+            });
+    
+            $userSchedule = [];
+            foreach ($userScheduleTable as $i => $scheduleRow) {
+                $datetimeData = $this->searchUserCheckTime(
+                    $checkInOutTable, 
+                    $scheduleRow->USERID,
+                    $scheduleRow->dateStart,
+                    $scheduleRow->dateEnd,
+                    [
+                        'cometime' => $scheduleRow->COMETIME,
+                        'leavetime' => $scheduleRow->LEAVETIME
+                    ]
+                );
+                $userSchedule[] = $datetimeData;
+            }
+    
+            $validUserSchedule = $this->validPresence($userSchedule);
+
+            DB::table('presensi')->insert($validUserSchedule);
+
+            $presence = DB::table('presensi')
+                ->whereDate('work_date_start', '=', $date)
+                ->whereDate('work_date_end', '=', $date)
+                ->get();
+            
+            return $presence->toArray();
+        } else {
+            $presence = DB::table('presensi')
+                ->whereDate('work_date_start', '=', $date)
+                ->whereDate('work_date_end', '=', $date)
+                ->get();
+
+            dd($presence->toArray());
+            return $presence->toArray();
+        }
     }
 
     /**

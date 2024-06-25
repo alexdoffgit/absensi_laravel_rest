@@ -23,7 +23,7 @@ interface Kehadiran
      *   time: 'week'|'month',
      *   page: int
      * }|null $options
-     * @return list<array{
+     * @return list<object{
      *   id: int,
      *   work_date_start: string,
      *   work_date_end: string,
@@ -39,4 +39,26 @@ interface Kehadiran
      * @throws App\Exceptions\DepartmentNotFoundException
      */
     public function getPresenceFiltered($deptId, $options);
+
+    /**
+     * @param \DateTimeImmutable $date
+     * @param array{
+     *   deptId: int,
+     *   userId?: int
+     * } $options
+     * @return list<object{
+     *   id: int,
+     *   work_date_start: string,
+     *   work_date_end: string,
+     *   checkin: string,
+     *   checkout: string,
+     *   istirahat_start: string|null,
+     *   istirahat_end: string|null,
+     *   istirahat_start_schedule: string|null,
+     *   istirahat_end_schedule: string|null,
+     *   username: string,
+     *   user_id: int
+     * }>
+     */
+    public function getPresencePerDay($date, $options);
 }
