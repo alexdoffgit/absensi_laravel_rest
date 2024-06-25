@@ -194,22 +194,43 @@ class Kehadiran implements IKehadiran
         $presenceQty = DB::table('presensi')->count();
 
         if($presenceQty == 0) {
-            // if i ask for certain date, should i get range yesterday
-            $checkInOutTable = DB::table('checkinout as c')
-                ->join('userinfo as u', 'c.USERID', '=', 'u.USERID')
-                ->join('user_sch as us', 'u.USERID', '=', 'us.USERID')
-                ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
-                ->whereDate('c.CHECKTIME', '=', $date)
-                ->select(['c.USERID', 'c.CHECKTIME', 'c.CHECKTYPE'])
-                ->get();
+            if (isset($options['userId'])) {
+                $checkInOutTable = DB::table('checkinout as c')
+                    ->join('userinfo as u', 'c.USERID', '=', 'u.USERID')
+                    ->join('user_sch as us', 'u.USERID', '=', 'us.USERID')
+                    ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                    ->where('u.USERID', '=', $options['userId'])
+                    ->whereDate('c.CHECKTIME', '=', $date)
+                    ->select(['c.USERID', 'c.CHECKTIME', 'c.CHECKTYPE'])
+                    ->get();
+
+                $userScheduleTable = DB::table('user_sch as us')
+                    ->join('userinfo as u', 'us.USERID', '=', 'u.USERID')
+                    ->where('u.USERID', '=', $options['userId'])
+                    ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                    ->whereDate('us.COMETIME', '=', $date)
+                    ->select(['us.USERID', 'us.COMETIME', 'us.LEAVETIME', 'us.SCHCLASSID'])
+                    ->get();
+            } else {
+                // if i ask for certain date, should i get range yesterday
+                $checkInOutTable = DB::table('checkinout as c')
+                    ->join('userinfo as u', 'c.USERID', '=', 'u.USERID')
+                    ->join('user_sch as us', 'u.USERID', '=', 'us.USERID')
+                    ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                    ->whereDate('c.CHECKTIME', '=', $date)
+                    ->select(['c.USERID', 'c.CHECKTIME', 'c.CHECKTYPE'])
+                    ->get();
+
+                // i don't know if i should use the same cometime and leavetime
+                $userScheduleTable = DB::table('user_sch as us')
+                    ->join('userinfo as u', 'us.USERID', '=', 'u.USERID')
+                    ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                    ->whereDate('us.COMETIME', '=', $date)
+                    ->select(['us.USERID', 'us.COMETIME', 'us.LEAVETIME', 'us.SCHCLASSID'])
+                    ->get();
+            }
     
-            // i don't know if i should use the same cometime and leavetime
-            $userScheduleTable = DB::table('user_sch as us')
-                ->join('userinfo as u', 'us.USERID', '=', 'u.USERID')
-                ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
-                ->whereDate('us.COMETIME', '=', $date)
-                ->select(['us.USERID', 'us.COMETIME', 'us.LEAVETIME', 'us.SCHCLASSID'])
-                ->get();
+
     
             $checkInOutTable->transform(function($item, $key) {
                 $item->datestring = explode(' ', $item->CHECKTIME)[0];
@@ -248,12 +269,23 @@ class Kehadiran implements IKehadiran
             
             return $presence->toArray();
         } else {
-            $presence = DB::table('presensi')
-                ->whereDate('work_date_start', '=', $date)
-                ->whereDate('work_date_end', '=', $date)
-                ->get();
+            if (isset($options['userId'])) {
+                $presence = DB::table('presensi as p')
+                    ->join('userinfo as u', 'u.USERID', '=', 'p.user_id')
+                    ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                    ->where('p.user_id', '=', $options['userId'])
+                    ->whereDate('p.work_date_start', '=', $date)
+                    ->whereDate('p.work_date_end', '=', $date)
+                    ->get();
+            } else {
+                $presence = DB::table('presensi as p')
+                    ->join('userinfo as u', 'u.USERID', '=', 'p.user_id')
+                    ->where('u.DEFAULTDEPTID', '=', $options['deptId'])
+                    ->whereDate('p.work_date_start', '=', $date)
+                    ->whereDate('p.work_date_end', '=', $date)
+                    ->get();
+            }
 
-            dd($presence->toArray());
             return $presence->toArray();
         }
     }
