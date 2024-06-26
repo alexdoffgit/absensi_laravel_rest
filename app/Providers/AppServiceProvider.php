@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Database\Query\Grammars\MariaDBGrammar;
+use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 
@@ -52,5 +55,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrapFive();
+        DB::connection()->setQueryGrammar(new MariaDBGrammar);
     }
 }
