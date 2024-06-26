@@ -291,6 +291,43 @@ class Kehadiran implements IKehadiran
     }
 
     /**
+     * @param \DateTimeImmutable $date
+     * @param int $deptId
+     * @param array{userId?: int} $options
+     * @return list<object{
+     *   id: int,
+     *   user_id: int,
+     *   tanggal_pengajuan: string,
+     *   tanggal_mulai: string,
+     *   tanggal_selesai: string,
+     *   alasan: string,
+     *   dokumen_pendukung: string,
+     *   tipe_absen: string
+     * }>
+     */
+    public function getAbsencePerDay($date, $deptId, $options)
+    {
+        $absensiTable = DB::table('absensi as a')
+            ->join('leaveclass as l', 'a.leaveclass_id', '=', 'l.LEAVEID')
+            ->join('userinfo as u', 'u.USERID', '=', 'a.user_id')
+            ->whereDate('a.tanggal_mulai', '=', $date)
+            ->where('u.DEFAULTDEPTID', '=', $deptId)
+            ->select([
+                'a.id', 
+                'a.user_id', 
+                'a.tanggal_pengajuan', 
+                'a.tanggal_mulai',
+                'a.tanggal_selesai',
+                'a.alasan',
+                'a.dokumen_pendukung',
+                'l.LEAVENAME'
+            ])
+            ->get();
+
+        return $absensiTable->toArray();
+    }
+
+    /**
      * @param array<int, array{CHECKTYPE: string, CHECKTIME: \DateTimeImmutable}> $nativeCheckinout
      * @return array<int, array{
      *   datetime: \DateTimeImmutable,

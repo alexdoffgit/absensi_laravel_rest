@@ -61,4 +61,21 @@ interface Kehadiran
      * }>
      */
     public function getPresencePerDay($date, $options);
+
+    /**
+     * @param \DateTimeImmutable $date
+     * @param int $deptId
+     * @param array{userId?: int} $options
+     * @return list<array{
+     *   id: int,
+     *   user_id: int,
+     *   tanggal_pengajuan: string,
+     *   tanggal_mulai: string,
+     *   tanggal_selesai: string,
+     *   alasan: string,
+     *   dokumen_pendukung: string,
+     *   tipe_absen: string
+     * }>
+     */
+    public function getAbsencePerDay($date, $deptId, $options);
 }
