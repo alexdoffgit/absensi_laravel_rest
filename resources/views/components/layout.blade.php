@@ -12,16 +12,17 @@
         <div class="row">
             <div class="col-2 g-0">
                 @if($jabatan == 'staff')
-                    <x-nav-karyawan :$uid />
-                @elseif ($jabatan == 'atasan')
-                    <x-nav-atasan :$uid />
+                    <x-nav-karyawan :$uid :$empName />
+                @elseif ($jabatan == 'manager')
+                    <x-nav-atasan :$uid :$empName />
                 @elseif ($jabatan == 'hr')
-                    <x-nav-hr :$uid />
+                    <x-nav-hr :$uid :$empName />
                 @else
-                    
+                    <x-nav-blank />
                 @endif
             </div>
             <div class="col-10 g-0">
+                <x-top-nav :$empName />
                 {{ $slot }}
             </div>
         </div>

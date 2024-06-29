@@ -6,13 +6,12 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class NavHr extends Component
+class TopNav extends Component
 {
     /**
      * Create a new component instance.
      */
     public function __construct(
-        public string $uid,
         public string $empName
     ) {}
 
@@ -21,6 +20,6 @@ class NavHr extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.nav-hr');
+        return view('components.top-nav');
     }
 }
