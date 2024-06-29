@@ -13,12 +13,12 @@ class Test extends Controller
 
     public function index(Request $request)
     {
-        // select checktime, checktype, userid dalam  5 tahun dari hari ini
-        // pisahkan menjadi format date, time start, time end
-        dd($this->kehadiran->getPresenceFiltered(80, ['time' => 'month', 'page' => 1]));
-        // $this->kehadiran->getPresenceFiltered(80, ['time' => 'month', 'page' => 1]);
-
-        return view('test', ['jabatan' => 'hr', 'uid' => 3]);
+        // $t = $this->kehadiran->getEmployeeAttendanceByIdAndTimeRange(3, [
+        //     'start' => \DateTimeImmutable::createFromFormat('Y-m-d', '2023-12-01'),
+        //     'end' => \DateTimeImmutable::createFromFormat('Y-m-d', '2023-12-31')
+        // ]);
+        // dd($t);
+        return view('test', ['jabatan' => 'staff', 'uid' => 3, 'empName' => 'Andi']);
     }
 
     private function testing_how_long_i_can_go_back_in_time_before_memory_run_out()

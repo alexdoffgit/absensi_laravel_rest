@@ -1,2 +1,2 @@
-<x-layout title="test" :$uid :$jabatan>
+<x-layout title="test" :$uid :$jabatan :$empName>
 </x-layout>
