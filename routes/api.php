@@ -8,4 +8,4 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/{uid}/{yearmonth}/kehadiran', [Kehadiran::class, 'getEventObjects']);
+Route::get('/{uid}/kehadiran', [Kehadiran::class, 'getEventObjects']);

@@ -15,67 +15,138 @@ class Kehadiran implements IKehadiran
 
     public function __construct(private TimeHelper $time) {}
 
-    public function getScheduleByEmployeeIdAndDate($uid, $date)
+    /**
+     * @param int $uid
+     * @param array{
+     *   start: \DateTimeImmutable,
+     *   end: \DateTimeImmutable,
+     * } $timeRange
+     * @return list<array{
+     *   start: string,
+     *   end: string,
+     *   color: 'red'|'green'|'orange'|'purple',
+     *   display: 'background'
+     * }>
+     * @throws App\Exceptions\EmployeeNotFoundException
+     */
+    public function getEmployeeAttendanceByIdAndTimeRange($uid, $timeRange)
     {
-        $monthInterval = $this->time->getFirstDateAndLastDateOfMonth(
-            intval($date->format('Y')), intval($date->format('n')));
+        $employeeAttendance = [];
 
-        $schclassTable = DB::table('schclass')
-            ->join('user_schedule', 'schclass.schclassid', '=', 'user_schedule.schclass_id')
-            ->where('user_schedule.user_id', '=', $uid)
-            ->select(['STARTTIME', 'ENDTIME'])
-            ->first();
 
-        
-        
-        if(empty($schclassTable)) {
-            throw new EmployeeNotFoundException($uid);
+        $presenceCount = DB::table('presensi')
+            ->whereDate('work_date_start', '>=', $timeRange['start'])
+            ->whereDate('work_date_end', '<=', $timeRange['end'])
+            ->where('user_id', '=', $uid)
+            ->count();
+        if($presenceCount > 0) {
+            $presenceTable = DB::table('presensi')
+                ->whereDate('work_date_start', '>=', $timeRange['start'])
+                ->whereDate('work_date_end', '<=', $timeRange['end'])
+                ->where('user_id', '=', $uid)
+                ->select(['checkin', 'checkout'])
+                ->get()
+                ->map(function($item, $key) {
+                    return [
+                        'start' => explode(' ', $item->checkin)[0],
+                        'end' => explode(' ', $item->checkout)[0],
+                        'color' => 'green',
+                        'display' => 'background'
+                    ];
+                });
+            foreach ($presenceTable as $presenceRow) {
+                $employeeAttendance[] = $presenceRow;
+            }
+        } else {
+            $skip = 0;
+            $take = 200;
+            $userScheduleTable = DB::table('user_sch')
+                ->whereDate('COMETIME', '>=', $timeRange['start'])
+                ->whereDate('LEAVETIME', '<=', $timeRange['end'])
+                ->where('USERID', '=', $uid)
+                ->orderBy('COMETIME')
+                ->select(['COMETIME', 'LEAVETIME'])
+                ->get()
+                ->map(function($item, $key) {
+                    $item->dateStart = explode(' ', $item->COMETIME)[0];
+                    $item->dateEnd = explode(' ', $item->LEAVETIME)[0];
+                    return $item;
+                });
+            $checkInOutTable = DB::table('checkinout')
+                ->whereDate('CHECKTIME', '>=', $timeRange['start'])
+                ->whereDate('CHECKTIME', '<=', $timeRange['end'])
+                ->where('USERID', '=', $uid)
+                ->orderBy('CHECKTIME')
+                ->select(['CHECKTIME', 'CHECKTYPE', 'USERID'])
+                ->get()
+                ->map(function($item, $key) {
+                    $item->datestring = explode(' ', $item->CHECKTIME)[0];
+                    return $item;
+                });
+            $presenceTable = [];
+            foreach ($userScheduleTable as $userScheduleRow_1) {
+                $presenceTableRow = $this->searchUserCheckTime(
+                    $checkInOutTable,
+                    $uid,
+                    $userScheduleRow_1->dateStart,
+                    $userScheduleRow_1->dateEnd,
+                    [
+                        'cometime' => $userScheduleRow_1->COMETIME,
+                        'leavetime' => $userScheduleRow_1->LEAVETIME
+                    ]
+                );
+                $presenceTable[] = $presenceTableRow;
+            }
+            $presenceTable = $this->validPresence($presenceTable);
+            DB::table('presensi')->insert($presenceTable);
+            $presenceTable = DB::table('presensi')
+                ->whereDate('work_date_start', '>=', $timeRange['start'])
+                ->whereDate('work_date_end', '<=', $timeRange['end'])
+                ->where('user_id', '=', $uid)
+                ->select(['checkin', 'checkout'])
+                ->get()
+                ->map(function($item, $key) {
+                    return [
+                        'start' => explode(' ', $item->checkin)[0],
+                        'end' => explode(' ', $item->checkout)[0],
+                        'color' => 'green',
+                        'display' => 'background'
+                    ];
+                });
+            foreach ($presenceTable as $presenceRow) {
+                $employeeAttendance[] = $presenceRow;
+            }
         }
-        $timeSchedule = [
-            'start' => \DateTimeImmutable::createFromFormat('H:i:s', $schclassTable->STARTTIME),
-            'end' => \DateTimeImmutable::createFromFormat('H:i:s', $schclassTable->ENDTIME)
-        ];
 
+        $absensiCount = DB::table('absensi')
+            ->whereDate('tanggal_mulai', '>=', $timeRange['start'])
+            ->whereDate('tanggal_selesai', '<=', $timeRange['end'])
+            ->where('user_id', '=', $uid)
+            ->count();
+        if($absensiCount > 0) {
+            $absensiTable = DB::table('absensi as a')
+                ->join('leaveclass as l', 'a.leaveclass_id', '=', 'l.LEAVEID')
+                ->whereDate('a.tanggal_mulai', '>=', $timeRange['start'])
+                ->whereDate('a.tanggal_selesai', '<=', $timeRange['end'])
+                ->where('a.user_id', '=', $uid)
+                ->select(['a.tanggal_mulai', 'a.tanggal_selesai', 'l.LEAVENAME'])
+                ->get()
+                ->map(function($item, $key) {
+                    return [
+                        'start' => $item->tanggal_mulai,
+                        'end' => $item->tanggal_selesai,
+                        'color' => 'purple',
+                        'display' => 'background'
+                    ];
+                });
 
-        // if checkin is bigger than starttime or checkout is smaller than endtime, red, else green
-        $checkinoutTable = DB::table('checkinout')
-            ->where('USERID', '=', $uid)
-            ->whereDate('CHECKTIME', '>=', $monthInterval['first']->format('Y-m-d'))
-            ->whereDate('CHECKTIME', '<=', $monthInterval['last']->format('Y-m-d'))
-            ->select(['CHECKTYPE', 'CHECKTIME'])
-            ->get();
-
-
-        // turn checktype to datetime immutable
-        $nativeCheckinout = [];
-        foreach ($checkinoutTable as $checkinout1) {
-            $temp1 = [];
-            $temp1['CHECKTYPE'] = $checkinout1->CHECKTYPE;
-            $temp1['CHECKTIME'] = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $checkinout1->CHECKTIME);
-            $nativeCheckinout[] = $temp1;
+            foreach ($absensiTable as $absensiRow) {
+                $employeeAttendance[] = $absensiRow;
+            }
         }
 
-        /*
-            change collection to: [
-                'datetime' => ...,
-                'time_start => ...,
-                'time_end' => ...,
-            ]
-        */
-        $checkinout2 = $this->checkinoutTransformer($nativeCheckinout);
 
-
-        // check if time_start is more than STARTTIME or time_end is smaller than ENDTIME, add color red to it else add color green
-        /*
-            end data type:
-            [
-                'start' => ...,
-                'end' => ...,
-                'color' => ...,
-                'display' => 'background'
-            ]
-        */
-        return $this->presentDateTransformer($checkinout2, $timeSchedule);
+        return $employeeAttendance;
     }
 
     /**
@@ -328,6 +399,38 @@ class Kehadiran implements IKehadiran
     }
 
     /**
+     * @param array{
+     *   start: \DateTimeImmutable,
+     *   end: \DateTimeImmutable
+     * } $timeRange
+     * @param int $deptId
+     * @param array{
+     *   userId: int
+     * } $options
+     * @return array{
+     *   leave_total_count: int,
+     *   sick_total_count: int
+     * }
+     */
+    public function getPresenceSummary($timeRange, $deptId, $options)
+    {
+        $leave_total_count = DB::table('absensi')
+            ->whereDate('tanggal_mulai', '>=', $timeRange['start'])
+            ->whereDate('tanggal_mulai', '<=', $timeRange['end'])
+            ->where('leaveclass_id', '=', 8)
+            ->count();
+        $sick_total_count = DB::table('absensi')
+            ->whereDate('tanggal_mulai', '>=', $timeRange['start'])
+            ->whereDate('tanggal_mulai', '<=', $timeRange['end'])
+            ->where('leaveclass_id', '=', 5)
+            ->count();
+        return [
+            'leave_total_count' => $leave_total_count,
+            'sick_total_count' => $sick_total_count
+        ];
+    }
+
+    /**
      * @param array<int, array{CHECKTYPE: string, CHECKTIME: \DateTimeImmutable}> $nativeCheckinout
      * @return array<int, array{
      *   datetime: \DateTimeImmutable,
@@ -481,6 +584,7 @@ class Kehadiran implements IKehadiran
      * @param list<object{
      *   USERID: int,
      *   CHECKTIME: string,
+     *   CHECKTYPE: 'I'|'O',
      *   datestring: string
      * }> $checkInOut
      * @param int $userId
@@ -489,7 +593,6 @@ class Kehadiran implements IKehadiran
      * @param array{
      *   cometime: string, 
      *   leavetime: string,
-     *   username: string,
      * } $injected
      * @return array{
      *   id: int,

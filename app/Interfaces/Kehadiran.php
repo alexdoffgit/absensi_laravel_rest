@@ -6,16 +6,19 @@ interface Kehadiran
 {
     /**
      * @param int $uid
-     * @param \DateTimeImmutable $date
-     * @return array<int, array{
+     * @param array{
+     *   start: \DateTimeImmutable,
+     *   end: \DateTimeImmutable
+     * } $timeRange
+     * @return list<array{
      *   start: string,
      *   end: string,
-     *   color: 'red'|'green',
+     *   color: 'red'|'green'|'orange'|'purple',
      *   display: 'background'
      * }>
      * @throws App\Exceptions\EmployeeNotFoundException
      */
-    public function getScheduleByEmployeeIdAndDate($uid, $date);
+    public function getEmployeeAttendanceByIdAndTimeRange($uid, $timeRange);
     
     /**
      * @param int $deptId
@@ -78,4 +81,21 @@ interface Kehadiran
      * }>
      */
     public function getAbsencePerDay($date, $deptId, $options);
+
+    /**
+     * @param array{
+     *   start: \DateTimeImmutable,
+     *   end: \DateTimeImmutable
+     * } $timeRange
+     * @param int $deptId
+     * @param array{
+     *   userId: int
+     * } $options
+     * @return array{
+     *   leave_total_count: int,
+     *   sick_total_count: int,
+     *   total_jam_dinas_luar: string
+     * }
+     */
+    public function getPresenceSummary($timeRange, $deptId, $options);
 }

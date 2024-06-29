@@ -7,5 +7,6 @@ import { createCalendar } from './fullcalendar'
 
 window.$ = $;
 window.absensi = {
-    createCalendar
+    createCalendar,
+    writtenDate: new Date()
 }
