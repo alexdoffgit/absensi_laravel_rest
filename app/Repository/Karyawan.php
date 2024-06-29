@@ -172,4 +172,22 @@ class Karyawan implements KI
             return 'staff';
         }
     }
+
+    private function insertLeaveAllowance()
+    {
+        DB::transaction(function() {
+            $userinfoTable = DB::table('userinfo')
+                ->select('USERID')
+                ->get();
+            foreach ($userinfoTable as $value) {
+                $leaveAllowanceRow = [
+                    'user_id' => $value->USERID,
+                    'allowance' => 12,
+                    'year' => 2024
+                ];
+    
+                DB::table('leave_allowance')->insert(($leaveAllowanceRow));
+            }
+        });
+    }
 }
