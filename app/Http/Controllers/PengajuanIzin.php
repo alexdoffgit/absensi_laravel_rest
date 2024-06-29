@@ -26,17 +26,32 @@ class PengajuanIzin extends Controller
             'selesai_izin' => 'required|date_format:Y-m-d',
             'atasan' => 'numeric',
             'izin' => 'numeric',
-            'alasan' => 'nullable'
+            'alasan' => 'nullable',
+            'dokumen' => 'nullable|file|mimes:pdf|max:10240'
         ]);
 
-        $inDatabase = [
-            'tanggal_pengajuan' => $data['tanggal_pengajuan'],
-            'tanggal_mulai' => $data['mulai_izin'],
-            'tanggal_selesai' => $data['selesai_izin'],
-            'atasan_id' => $data['atasan'],
-            'tipe_izin' => $data['izin'],
-            'alasan' => $data['alasan'],
-        ];
+        if($request->hasFile('dokumen')) {
+            $filePath = null;
+            $filePath = $request->file('dokumen')->store('uploads', 'public');
+            $inDatabase = [
+                'tanggal_pengajuan' => $data['tanggal_pengajuan'],
+                'tanggal_mulai' => $data['mulai_izin'],
+                'tanggal_selesai' => $data['selesai_izin'],
+                'atasan_id' => $data['atasan'],
+                'tipe_izin' => $data['izin'],
+                'alasan' => $data['alasan'],
+                'dokumen_pendukung' => $filePath
+            ];
+        } else {
+            $inDatabase = [
+                'tanggal_pengajuan' => $data['tanggal_pengajuan'],
+                'tanggal_mulai' => $data['mulai_izin'],
+                'tanggal_selesai' => $data['selesai_izin'],
+                'atasan_id' => $data['atasan'],
+                'tipe_izin' => $data['izin'],
+                'alasan' => $data['alasan'],
+            ];
+        }
         
         $this->store->create(intval($karyawanid), $inDatabase);
 

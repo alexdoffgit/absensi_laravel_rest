@@ -16,7 +16,8 @@ class PengajuanIzin implements PI
                 'leaveclass_id' => $requestData['tipe_izin'],
                 'tanggal_pengajuan' => $requestData['tanggal_pengajuan'],
                 'tanggal_mulai' => $requestData['tanggal_mulai'],
-                'tanggal_selesai' => $requestData['tanggal_selesai']
+                'tanggal_selesai' => $requestData['tanggal_selesai'],
+                'dokumen_pendukung' => isset($requestData['dokumen_pendukung']) ? $requestData['dokumen_pendukung'] : null 
             ];
     
             $absensiId = DB::table('absensi')->insertGetId($tableData);
@@ -35,7 +36,7 @@ class PengajuanIzin implements PI
                 $dataPenyetujuAbsen[] = $satuPenyetuju;
             }
     
-            $hrId = 159;
+            $hrId = 54;
             $userinfoHR = DB::table('userinfo')
                 ->select('USERID')
                 ->where('DEFAULTDEPTID', '=', $hrId)

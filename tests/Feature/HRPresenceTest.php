@@ -18,7 +18,7 @@ class HRPresenceTest extends TestCase
     }
 
 
-    public function check_if_presence_table_is_filled_based_on_department()
+    public function test_check_if_presence_table_is_filled_based_on_department()
     {
         // arrange
         $deptId = 80;
@@ -45,7 +45,7 @@ class HRPresenceTest extends TestCase
         }
     }
 
-    public function check_employee_presence_per_day()
+    public function test_check_employee_presence_per_day()
     {
         // arrange
         $date  = \DateTimeImmutable::createFromFormat('Y-m-d', '2021-09-20');
@@ -91,10 +91,4 @@ class HRPresenceTest extends TestCase
         $this->assertArrayHasKey('sick_total_count', $summary);
         // $this->assertArrayHasKey('total_jam_dinas_luar', $summary);
     }
-
-    // public function tearDown(): void
-    // {
-    //     DB::table('presensi')->truncate();
-    //     parent::tearDown();
-    // }
 }

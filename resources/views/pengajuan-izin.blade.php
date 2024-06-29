@@ -19,7 +19,7 @@
 <body>
     <div class="simple-container border border-dark rounded">
         <h1>Pengajuan Izin</h1>
-        <form action="/{{$karyawanId}}/pengajuan-izin" method="POST">
+        <form action="/{{$karyawanId}}/pengajuan-izin" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3 mt-3">
                 <label for="tanggal_pengajuan" class="form-label">Tanggal Pengajuan</label>
@@ -54,6 +54,10 @@
             <div class="mb-3 mt-3">
                 <label for="alasan" class="form-label">Alasan</label>
                 <textarea name="alasan" id="alasan" cols="30" rows="5" class="d-block form-control"></textarea>
+            </div>
+            <div class="mb-3 mt-3">
+                <label for="dokumen" class="form-label">Dokumen Pendukung</label>
+                <input type="file" class="form-control" id="dokumen" name="dokumen">
             </div>
             <button type="submit" class="btn btn-primary">Ajukan Izin</button>
         </form>
