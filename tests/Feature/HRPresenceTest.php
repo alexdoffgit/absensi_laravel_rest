@@ -45,7 +45,7 @@ class HRPresenceTest extends TestCase
         }
     }
 
-    public function test_check_employee_presence_per_day()
+    public function check_employee_presence_per_day()
     {
         // arrange
         $date  = \DateTimeImmutable::createFromFormat('Y-m-d', '2021-09-20');
@@ -71,6 +71,25 @@ class HRPresenceTest extends TestCase
             $this->assertObjectHasProperty('istirahat_end_schedule', $data);
             $this->assertObjectHasProperty('user_id', $data);
         }
+    }
+
+    public function test_should_display_the_structure_of_absence_summary_correctly()
+    {
+        // arrange
+        $timeRange = [
+            'start' => \DateTimeImmutable::createFromFormat('Y-m-d', '2021-09-01'),
+            'end' => \DateTimeImmutable::createFromFormat('Y-m-d', '2021-09-30')
+        ];
+        $deptId = 80;
+        $options = null;
+        $kehadiran = new Kehadiran(new TimeHelper());
+        // act
+        $summary = $kehadiran->getPresenceSummary($timeRange, $deptId, $options);
+        // assert
+        $this->assertIsArray($summary);
+        $this->assertArrayHasKey('leave_total_count', $summary);
+        $this->assertArrayHasKey('sick_total_count', $summary);
+        // $this->assertArrayHasKey('total_jam_dinas_luar', $summary);
     }
 
     // public function tearDown(): void
