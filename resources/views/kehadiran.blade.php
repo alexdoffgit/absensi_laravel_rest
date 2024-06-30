@@ -9,22 +9,13 @@
     <x-slot:script>
         <script type="module">
             const calendar = window.absensi.createCalendar("{{ $uid }}");
-
             calendar.render();
 
             document.getElementById('prev').addEventListener('click', function() {
-                let timeStamp = window.absensi.writtenDate.setDate(
-                    window.absensi.writtenDate.getMonth() - 1
-                );
-                window.absensi.writtenDate = new Date(timeStamp)
                 calendar.prev();
             })
 
             document.getElementById('next').addEventListener('click', function() {
-                let timeStamp = window.absensi.writtenDate.setDate(
-                    window.absensi.writtenDate.getMonth() + 1
-                );
-                window.absensi.writtenDate = new Date(timeStamp)
                 calendar.next();
             })
         </script>

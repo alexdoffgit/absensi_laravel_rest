@@ -136,5 +136,37 @@ class PersetujuanIzin implements PI
                 'status' => $option,
                 'tanggal_update' => $tanggalUpdate
             ]);
+
+
+        // cek cuti
+        DB::transaction(function() use ($persetujuanId, $penanggungJawabId) {
+            $penyetujuAbsensiTable = DB::table('penyetuju_absensi')
+                ->where('id', '=', $persetujuanId)
+                ->select(['absensi_id'])
+                ->first();
+            
+            $nonPendingStatus = DB::table('penyetuju_absensi')
+                ->where('absensi_id', '=', $penyetujuAbsensiTable->absensi_id)
+                ->where('status', '!=', 'pending')
+                ->count();
+    
+            if ($nonPendingStatus == 0) {
+                $penyetujuAbsensiTable2 = DB::table('penyetuju_absensi as p')
+                    ->join('absensi as a', 'a.id', '=', 'p.absensi_id')
+                    ->where('p.id', '=', $persetujuanId)
+                    ->where('p.penanggungjawab_id', '=', $penanggungJawabId)
+                    ->select(['a.user_id', 'a.tanggal_pengajuan'])
+                    ->first();
+                
+                $year = explode(' ', $penyetujuAbsensiTable2->tanggal_pengajuan)[0];
+                $year = explode('-', $year)[0];
+    
+    
+                DB::table('leave_allowance')
+                    ->where('user_id', '=', $penyetujuAbsensiTable2->user_id)
+                    ->where('year', '=', intval($year))
+                    ->decrement('allowance');
+            }
+        });
     }
 }

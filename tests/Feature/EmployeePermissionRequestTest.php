@@ -29,5 +29,11 @@ class EmployeePermissionRequestTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    
+    public function test_leave_allowance_reduced()
+    {
+        // $p = new PengajuanIzin();
+        // $p->create(215, ['']);
+        // $p->
+        // $this->assertEquals($allowance, 11);
+    }
 }

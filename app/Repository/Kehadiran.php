@@ -45,106 +45,135 @@ class Kehadiran implements IKehadiran
                 ->whereDate('work_date_end', '<=', $timeRange['end'])
                 ->where('user_id', '=', $uid)
                 ->select(['checkin', 'checkout'])
-                ->get()
-                ->map(function($item, $key) {
-                    return [
-                        'start' => explode(' ', $item->checkin)[0],
-                        'end' => explode(' ', $item->checkout)[0],
+                ->get();
+
+                foreach ($presenceTable as $value) {
+                    $clockIn = explode(' ', $value->checkin)[1];
+                    $clockOut = explode(' ', $value->checkout)[1];
+
+                    $employeeAttendance[] = [
+                        'start' => explode(' ', $value->checkin)[0],
+                        'end' => explode(' ', $value->checkout)[0],
                         'color' => 'green',
-                        'display' => 'background'
+                        'display' => 'list-item',
+                        'title' => "in: {$clockIn}"
                     ];
-                });
-            foreach ($presenceTable as $presenceRow) {
-                $employeeAttendance[] = $presenceRow;
-            }
-        } else {
-            $skip = 0;
-            $take = 200;
-            $userScheduleTable = DB::table('user_sch')
-                ->whereDate('COMETIME', '>=', $timeRange['start'])
-                ->whereDate('LEAVETIME', '<=', $timeRange['end'])
-                ->where('USERID', '=', $uid)
-                ->orderBy('COMETIME')
-                ->select(['COMETIME', 'LEAVETIME'])
-                ->get()
-                ->map(function($item, $key) {
-                    $item->dateStart = explode(' ', $item->COMETIME)[0];
-                    $item->dateEnd = explode(' ', $item->LEAVETIME)[0];
-                    return $item;
-                });
-            $checkInOutTable = DB::table('checkinout')
-                ->whereDate('CHECKTIME', '>=', $timeRange['start'])
-                ->whereDate('CHECKTIME', '<=', $timeRange['end'])
-                ->where('USERID', '=', $uid)
-                ->orderBy('CHECKTIME')
-                ->select(['CHECKTIME', 'CHECKTYPE', 'USERID'])
-                ->get()
-                ->map(function($item, $key) {
-                    $item->datestring = explode(' ', $item->CHECKTIME)[0];
-                    return $item;
-                });
-            $presenceTable = [];
-            foreach ($userScheduleTable as $userScheduleRow_1) {
-                $presenceTableRow = $this->searchUserCheckTime(
-                    $checkInOutTable,
-                    $uid,
-                    $userScheduleRow_1->dateStart,
-                    $userScheduleRow_1->dateEnd,
-                    [
-                        'cometime' => $userScheduleRow_1->COMETIME,
-                        'leavetime' => $userScheduleRow_1->LEAVETIME
-                    ]
-                );
-                $presenceTable[] = $presenceTableRow;
-            }
-            $presenceTable = $this->validPresence($presenceTable);
-            DB::table('presensi')->insert($presenceTable);
-            $presenceTable = DB::table('presensi')
-                ->whereDate('work_date_start', '>=', $timeRange['start'])
-                ->whereDate('work_date_end', '<=', $timeRange['end'])
-                ->where('user_id', '=', $uid)
-                ->select(['checkin', 'checkout'])
-                ->get()
-                ->map(function($item, $key) {
-                    return [
-                        'start' => explode(' ', $item->checkin)[0],
-                        'end' => explode(' ', $item->checkout)[0],
+
+                    $employeeAttendance[] = [
+                        'start' => explode(' ', $value->checkin)[0],
+                        'end' => explode(' ', $value->checkout)[0],
                         'color' => 'green',
-                        'display' => 'background'
+                        'display' => 'list-item',
+                        'title' => "out: {$clockOut}"
                     ];
-                });
-            foreach ($presenceTable as $presenceRow) {
-                $employeeAttendance[] = $presenceRow;
-            }
+                }
         }
+        //  else {
+        //     $skip = 0;
+        //     $take = 200;
+        //     $userScheduleTable = DB::table('user_sch')
+        //         ->whereDate('COMETIME', '>=', $timeRange['start'])
+        //         ->whereDate('LEAVETIME', '<=', $timeRange['end'])
+        //         ->where('USERID', '=', $uid)
+        //         ->orderBy('COMETIME')
+        //         ->select(['COMETIME', 'LEAVETIME'])
+        //         ->get()
+        //         ->map(function($item, $key) {
+        //             $item->dateStart = explode(' ', $item->COMETIME)[0];
+        //             $item->dateEnd = explode(' ', $item->LEAVETIME)[0];
+        //             return $item;
+        //         });
+        //     $checkInOutTable = DB::table('checkinout')
+        //         ->whereDate('CHECKTIME', '>=', $timeRange['start'])
+        //         ->whereDate('CHECKTIME', '<=', $timeRange['end'])
+        //         ->where('USERID', '=', $uid)
+        //         ->orderBy('CHECKTIME')
+        //         ->select(['CHECKTIME', 'CHECKTYPE', 'USERID'])
+        //         ->get()
+        //         ->map(function($item, $key) {
+        //             $item->datestring = explode(' ', $item->CHECKTIME)[0];
+        //             return $item;
+        //         });
+        //     $presenceTable = [];
+        //     foreach ($userScheduleTable as $userScheduleRow_1) {
+        //         $presenceTableRow = $this->searchUserCheckTime(
+        //             $checkInOutTable,
+        //             $uid,
+        //             $userScheduleRow_1->dateStart,
+        //             $userScheduleRow_1->dateEnd,
+        //             [
+        //                 'cometime' => $userScheduleRow_1->COMETIME,
+        //                 'leavetime' => $userScheduleRow_1->LEAVETIME
+        //             ]
+        //         );
+        //         $presenceTable[] = $presenceTableRow;
+        //     }
+        //     $presenceTable = $this->validPresence($presenceTable);
+        //     DB::table('presensi')->insert($presenceTable);
+        //     $presenceTable = DB::table('presensi')
+        //         ->whereDate('work_date_start', '>=', $timeRange['start'])
+        //         ->whereDate('work_date_end', '<=', $timeRange['end'])
+        //         ->where('user_id', '=', $uid)
+        //         ->select(['checkin', 'checkout'])
+        //         ->get()
+        //         ->map(function($item, $key) {
+        //             return [
+        //                 'start' => explode(' ', $item->checkin)[0],
+        //                 'end' => explode(' ', $item->checkout)[0],
+        //                 'color' => 'green',
+        //                 'display' => 'background'
+        //             ];
+        //         });
+        //     foreach ($presenceTable as $presenceRow) {
+        //         $employeeAttendance[] = $presenceRow;
+        //     }
+        // }
 
-        $absensiCount = DB::table('absensi')
-            ->whereDate('tanggal_mulai', '>=', $timeRange['start'])
-            ->whereDate('tanggal_selesai', '<=', $timeRange['end'])
-            ->where('user_id', '=', $uid)
-            ->count();
-        if($absensiCount > 0) {
-            $absensiTable = DB::table('absensi as a')
-                ->join('leaveclass as l', 'a.leaveclass_id', '=', 'l.LEAVEID')
-                ->whereDate('a.tanggal_mulai', '>=', $timeRange['start'])
-                ->whereDate('a.tanggal_selesai', '<=', $timeRange['end'])
-                ->where('a.user_id', '=', $uid)
-                ->select(['a.tanggal_mulai', 'a.tanggal_selesai', 'l.LEAVENAME'])
-                ->get()
-                ->map(function($item, $key) {
-                    return [
-                        'start' => $item->tanggal_mulai,
-                        'end' => $item->tanggal_selesai,
-                        'color' => 'purple',
-                        'display' => 'background'
-                    ];
-                });
+        // $absensiCount = DB::table('absensi')
+        //     ->whereDate('tanggal_mulai', '>=', $timeRange['start'])
+        //     ->whereDate('tanggal_selesai', '<=', $timeRange['end'])
+        //     ->where('user_id', '=', $uid)
+        //     ->count();
+        // if($absensiCount > 0) {
+        //     $absensiTable = DB::table('absensi as a')
+        //         ->join('leaveclass as l', 'a.leaveclass_id', '=', 'l.LEAVEID')
+        //         ->whereDate('a.tanggal_mulai', '>=', $timeRange['start'])
+        //         ->whereDate('a.tanggal_selesai', '<=', $timeRange['end'])
+        //         ->where('a.user_id', '=', $uid)
+        //         ->select(['a.tanggal_mulai', 'a.tanggal_selesai', 'l.LEAVENAME'])
+        //         ->get()
+        //         ->map(function($item, $key) {
+        //             return [
+        //                 'start' => $item->tanggal_mulai,
+        //                 'end' => $item->tanggal_selesai,
+        //                 'color' => 'purple',
+        //                 'display' => 'background'
+        //             ];
+        //         });
 
-            foreach ($absensiTable as $absensiRow) {
-                $employeeAttendance[] = $absensiRow;
-            }
+        //     foreach ($absensiTable as $absensiRow) {
+        //         $employeeAttendance[] = $absensiRow;
+        //     }
+        // }
+
+        $absensiTable = DB::table('user_speday as us')
+            ->join('leaveclass as l', 'us.dateid', '=', 'l.LEAVEID')
+            ->where('us.userid', '=', $uid)
+            ->select(['us.startspecday', 'us.endspecday', 'l.LEAVENAME'])
+            ->get();
+
+        foreach ($absensiTable as $absensiRow) {
+            $dateStart = explode(' ', $absensiRow->startspecday)[0];
+            $dateEnd = explode(' ', $absensiRow->endspecday)[0];
+
+            $employeeAttendance[] = [
+                'start' => $dateStart,
+                'end' => $dateEnd,
+                'color' => 'red',
+                'display' => 'list-item',
+                'title' => $absensiRow->LEAVENAME
+            ];
         }
-
 
         return $employeeAttendance;
     }
