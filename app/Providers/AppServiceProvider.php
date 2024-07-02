@@ -32,6 +32,9 @@ use App\Repository\Kehadiran as RKE;
 use App\Interfaces\Schedule as ISchedule;
 use App\Repository\Schedule as ScheduleRepo;
 
+use App\Interfaces\Menu as IMenu;
+use App\Repository\Menu as MenuRepo;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -47,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ITH::class, RTH::class);
         $this->app->bind(IKE::class, RKE::class);
         $this->app->bind(ISchedule::class, ScheduleRepo::class);
+        $this->app->bind(IMenu::class, MenuRepo::class);
     }
 
     /**

@@ -6,19 +6,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\Kehadiran;
 use Illuminate\Contracts\Database\Query\Builder;
+use App\Interfaces\Menu;
 
 class Test extends Controller
 {
-    public function __construct(private Kehadiran $kehadiran) {}
+    public function __construct(private Menu $menu)
+    {
+    }
 
     public function index(Request $request)
     {
-        // $t = $this->kehadiran->getEmployeeAttendanceByIdAndTimeRange(3, [
-        //     'start' => \DateTimeImmutable::createFromFormat('Y-m-d', '2023-12-01'),
-        //     'end' => \DateTimeImmutable::createFromFormat('Y-m-d', '2023-12-31')
-        // ]);
-        // dd($t);
-        return view('test', ['jabatan' => 'staff', 'uid' => 3, 'empName' => 'Andi']);
+        $menu = $this->menu->getMenuStructure([]);
+        // dd($menu);
+        return view('test', ['menu' => $menu]);
     }
 
     private function testing_how_long_i_can_go_back_in_time_before_memory_run_out()
@@ -35,7 +35,7 @@ class Test extends Controller
     {
         // $this->kehadiran->getPresenceByDepartmentId(80, null);
     }
-    
+
     private function testing_merge_user_and_schedule()
     {
         // $checkinoutOneUser = DB::table('checkinout')
@@ -45,7 +45,7 @@ class Test extends Controller
         //     ->select(['USERID', 'CHECKTIME', 'CHECKTYPE'])
         //     ->orderBy('CHECKTIME')
         //     ->get();
-        
+
         // $scheduleOneUser = DB::table('user_sch')
         //     ->where('USERID', '=', 1015)
         //     ->whereDate('COMETIME', '=', '2024-01-17')
@@ -102,7 +102,7 @@ class Test extends Controller
             ->select(['USERID', 'CHECKTIME', 'CHECKTYPE'])
             ->orderBy('CHECKTIME')
             ->get();
-        
+
         $scheduleTwoUser = DB::table('user_sch')
             ->where(function ($query) {
                 $query->where('USERID', '=', 1015)
@@ -112,37 +112,39 @@ class Test extends Controller
             ->select(['USERID', 'COMETIME', 'LEAVETIME', 'SCHCLASSID'])
             ->get();
 
-        $checkinoutTwoUser = $checkinoutTwoUser->map(function($item, $key) {
+        $checkinoutTwoUser = $checkinoutTwoUser->map(function ($item, $key) {
             $item->datestring = explode(' ', $item->CHECKTIME)[0];
             return $item;
         });
 
-        $scheduleTwoUser = $scheduleTwoUser->map(function($item, $key) {
+        $scheduleTwoUser = $scheduleTwoUser->map(function ($item, $key) {
             $item->dateStart = explode(' ', $item->COMETIME)[0];
             $item->dateEnd = explode(' ', $item->LEAVETIME)[0];
             return $item;
         });
 
-        $search = function($arr, $userid, $dateStart, $dateEnd, $cometime, $leavetime) {
+        $search = function ($arr, $userid, $dateStart, $dateEnd, $cometime, $leavetime) {
             $userPresensi = [];
             foreach ($arr as $key => $value) {
-                if(
-                    $value->USERID == $userid && 
-                    $value->datestring == $dateStart && 
-                    $value->CHECKTYPE == 'I') {
-                        $userPresensi['user_id'] = $value->USERID;
-                        $userPresensi['schedule_start'] = $cometime;
-                        $userPresensi['time_start'] = $value->CHECKTIME;
-                    }
+                if (
+                    $value->USERID == $userid &&
+                    $value->datestring == $dateStart &&
+                    $value->CHECKTYPE == 'I'
+                ) {
+                    $userPresensi['user_id'] = $value->USERID;
+                    $userPresensi['schedule_start'] = $cometime;
+                    $userPresensi['time_start'] = $value->CHECKTIME;
+                }
 
-                if(
-                    $value->USERID == $userid && 
-                    $value->datestring == $dateEnd && 
-                    $value->CHECKTYPE == 'O') {
-                        $userPresensi['user_id'] = $value->USERID;
-                        $userPresensi['schedule_end'] = $leavetime;
-                        $userPresensi['time_end'] = $value->CHECKTIME;
-                    }
+                if (
+                    $value->USERID == $userid &&
+                    $value->datestring == $dateEnd &&
+                    $value->CHECKTYPE == 'O'
+                ) {
+                    $userPresensi['user_id'] = $value->USERID;
+                    $userPresensi['schedule_end'] = $leavetime;
+                    $userPresensi['time_end'] = $value->CHECKTIME;
+                }
             }
 
             // check if user presensi array is valid
