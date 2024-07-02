@@ -36,9 +36,4 @@ Route::get('/{atasanid}/atasan/{id}/{option}', [AtasanIzin::class, 'acceptOrReje
 Route::get('/{hrid}/hr/permit-summaries', [HRIzin::class, 'permitSummaries']);
 Route::get('/{id}/hr/{absensiid}/{penanggungjawabid}', [HRIzin::class, 'permitDetail']);
 Route::get('/{hrid}/hr/{id}/{option}', [HRIzin::class, 'acceptOrReject']);
-// Route::get('/{hrid}/kehadiran/kehadiran-karyawan', function ($hrid) {
-//     Illuminate\Support\Facades\DB::table('presensi')->insert([
-//         ['user_id' => 1],
-//         ['user_id' => 2]
-//     ]);
-// });
+Route::get('/{hrid}/kehadiran/kehadiran-karyawan', );

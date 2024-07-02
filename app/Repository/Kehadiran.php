@@ -7,6 +7,7 @@ use App\Interfaces\Kehadiran as IKehadiran;
 use App\Exceptions\EmployeeNotFoundException;
 use App\Interfaces\TimeHelper;
 use App\Exceptions\NegativeNumberException;
+use Illuminate\Support\Collection;
 
 class Kehadiran implements IKehadiran
 {
@@ -457,6 +458,43 @@ class Kehadiran implements IKehadiran
             'leave_total_count' => $leave_total_count,
             'sick_total_count' => $sick_total_count
         ];
+    }
+
+    /**
+     * @param \DateTimeImmutable $day
+     * @param array{
+     *   deptId?: int,
+     *   userId?: int,
+     * }|null $options
+     * @return list<array{
+     *   deptId: int,
+     *   deptName: string,
+     *   summary: array<string, int>
+     * }>
+     */
+    public function getPresenceSummaryPerDay($day, $options)
+    {
+        $userSpedayTable = DB::table('user_speday as us')
+            ->join('leaveclass as l', 'us.dateid', '=', 'l.LEAVEID')
+            ->join('userinfo as u', 'l.userid', '=', 'u.USERID')
+            ->whereDate('us.startspecday', '=', $day);
+    
+        if(!empty($options)) {
+            if(array_key_exists('deptId', $options)) {
+                $userSpedayTable->where('u.DEFAULTDEPTID', '=', $options['deptId']);
+            }
+            if(array_key_exists('userId', $options)) {
+                $userSpedayTable = $userSpedayTable->where('u.USERID', '=', $options['userId']);
+            }
+        }
+
+        $userSpedayTable = $userSpedayTable
+            ->select(['l.LEAVENAME', 'u.DEFAULTDEPTID', 'u.Name', 'u.USERID'])
+            ->get();
+
+        foreach ($variable as $key => $value) {
+            # code...
+        }
     }
 
     /**

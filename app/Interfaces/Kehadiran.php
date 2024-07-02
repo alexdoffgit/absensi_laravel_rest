@@ -98,4 +98,18 @@ interface Kehadiran
      * }
      */
     public function getPresenceSummary($timeRange, $deptId, $options);
+
+    /**
+     * @param \DateTimeImmutable $day
+     * @param array{
+     *   deptId?: int,
+     *   userId?: int,
+     * } $options
+     * @return list<array{
+     *   deptId: int,
+     *   deptName: string,
+     *   summary: array<string, int>
+     * }>
+     */
+    public function getPresenceSummaryPerDay($day, $options);
 }
