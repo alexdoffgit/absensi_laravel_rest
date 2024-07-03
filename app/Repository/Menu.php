@@ -19,16 +19,22 @@ class Menu implements IMenu
     {
         $menuTable = DB::table('menu_links as ml')
             ->join('menu_links_roles as mlr', 'ml.id', '=', 'mlr.menu_link_id')
-            ->leftJoin('menu_groups as mg', 'ml.menu_group_id', '=', 'mg.id')
-            ->whereNotNull('ml.menu_group_id')
+            ->whereNotNull('ml.menu_name')
+            ->whereNotNull('ml.laravel_controller_class')
+            ->whereNotNull('ml.laravel_controller_method')
             ->select([
                 'ml.menu_path',
                 'ml.menu_name',
-                'mg.group_name',
+                'ml.laravel_controller_class',
+                'ml.laravel_controller_method'
             ])
-            ->get();
+            ->get()
+            ->map(function ($item, $key) {
+                $item->menu_name = explode('.', $item->menu_name);
+                return $item;
+            });
 
-        $menuTable = $menuTable->groupBy('group_name');
+        // dd($menuTable->toArray());
 
         return $menuTable->toArray();
     }

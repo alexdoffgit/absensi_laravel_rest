@@ -18,7 +18,7 @@ class Test extends Controller
     {
         $menu = $this->menu->getMenuStructure([]);
         // dd($menu);
-        return view('test', ['menu' => $menu]);
+        return view('test', ['menus' => $menu]);
     }
 
     private function testing_how_long_i_can_go_back_in_time_before_memory_run_out()

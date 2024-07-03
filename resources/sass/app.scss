@@ -1,5 +1,34 @@
 // Fonts
 // @import url('https://fonts.bunny.net/css?family=Nunito');
 
-// Bootstrap
-@import 'bootstrap/scss/bootstrap';
+// // Bootstrap
+// @import 'bootstrap/scss/bootstrap';
+
+@import 'bootstrap/scss/functions';
+
+@import 'bootstrap/scss/variables';
+
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root";
+
+$my-spacers: (
+    menu-0: 0,
+    menu-1: $spacer,
+    menu-2: $spacer * 2
+);
+
+$spacers: map-merge($spacers, $my-spacers);
+
+
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/helpers";
+
+@import "bootstrap/scss/utilities/api";
+
+
