@@ -1,3 +1,4 @@
 <div>
-    {{ $loggedInUser }}
+    <p>{{ $loggedInUser }}</p>
+    <p>this is hr page</p>
 </div>

@@ -15,7 +15,7 @@ class Authentication implements IAuth
             ->where('PASSWORD', '=', $textPassword)
             ->first();
 
-        return empty($userinfoTable) ? null:  $userinfoTable->USERID;
+        return empty($userinfoTable) ? null :  $userinfoTable->USERID;
     }
 
     // TODO: not use plain text to store password

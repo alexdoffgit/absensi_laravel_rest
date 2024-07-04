@@ -5,16 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Interfaces\Authentication;
+use App\Interfaces\Karyawan;
 
 class AuthController extends Controller
 {
-    public function __construct(private Authentication $au) {}
+    public function __construct(
+        private Authentication $au,
+        private Karyawan $karyawan
+    ) {
+    }
 
-    public function loginView() {
+    public function loginView()
+    {
         return view('login');
     }
 
-    public function login(Request $request) 
+    public function login(Request $request)
     {
         $formdata = $request->validate([
             'username' => 'required',
@@ -26,11 +32,19 @@ class AuthController extends Controller
         if (empty($uid)) {
             return back()->with('invalid', true);
         } else {
-            return redirect(url("/{$uid}/kehadiran"));
+            session(['userId' => $uid]);
+            $roles = $this->karyawan->getRoles($uid);
+            if ($roles == 'hr') {
+                return redirect('/hr/attendance/analysis');
+            } else if ($roles == 'manager') {
+                return redirect('/manager/attendande/analysis');
+            } else {
+                return redirect('/attendance/analysis');
+            }
         }
     }
 
-    public function registerView() 
+    public function registerView()
     {
         return view('register');
     }
