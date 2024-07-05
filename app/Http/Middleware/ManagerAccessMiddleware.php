@@ -7,9 +7,8 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Interfaces\Karyawan;
 use App\Exceptions\EmployeeNotFoundException;
-use Illuminate\Support\Facades\Log;
 
-class HRMenuAccessMiddleware
+class ManagerAccessMiddleware
 {
     public function __construct(private Karyawan $employee) {}
     /**
@@ -27,16 +26,16 @@ class HRMenuAccessMiddleware
         try {
             $roles = $this->employee->getRoles($userId);
 
-            if($roles == 'hr') {
+            if ($roles == 'manager') {
                 return $next($request);
             } else {
                 return back();
             }
-        } catch (\Throwable $th) {
-            if($th instanceof EmployeeNotFoundException) {
-                return redirect('/');
+        } catch(\Throwable $th) {
+            if ($th instanceof EmployeeNotFoundException) {
+                return redirect();
             } else {
-                abort(500, 'something went wrong');
+                abort(500, $th->getMessage());
             }
         }
     }
