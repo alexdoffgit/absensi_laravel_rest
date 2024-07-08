@@ -8,7 +8,7 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
-    <div class="container-fluid">
+    {{-- <div class="container-fluid">
         <div class="row">
             <div class="col-2 bg-black d-flex flex-column" style="height: 100vh">
                 @foreach ($menus as $menu)
@@ -31,6 +31,7 @@
                 @endforeach
             </div>
         </div>
-    </div>
+    </div> --}}
+    <x-sidenav />
 </body>
 </html>

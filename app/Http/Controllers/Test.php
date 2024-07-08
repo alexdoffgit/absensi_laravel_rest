@@ -16,9 +16,7 @@ class Test extends Controller
 
     public function index(Request $request)
     {
-        $menu = $this->menu->getMenuStructure([]);
-        // dd($menu);
-        return view('test', ['menus' => $menu]);
+        return view('test');
     }
 
     private function testing_how_long_i_can_go_back_in_time_before_memory_run_out()
