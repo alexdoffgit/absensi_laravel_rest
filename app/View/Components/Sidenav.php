@@ -14,7 +14,8 @@ class Sidenav extends Component
      */
     public function __construct(
         private Menu $menu
-    ) {}
+    ) {
+    }
 
     /**
      * Get the view / contents that represent the component.
