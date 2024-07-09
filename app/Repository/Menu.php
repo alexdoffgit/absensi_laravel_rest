@@ -118,6 +118,12 @@ class Menu implements IMenu
             ->values();
 
         $menus = $menus->merge($independentGenericMenu);
+        $menus = $menus->map(function($item, $key) {
+            if($item->menu_level == 2) {
+                $item->menu_name = explode('.', $item->menu_name)[1];
+            }
+            return $item;
+        });
 
         return $menus->toArray();
     }
