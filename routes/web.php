@@ -30,7 +30,6 @@ Route::post('/register', [AuthController::class, 'register']);
 $menuTable = DB::table('menu_links')
     ->whereNotNull('laravel_controller_class')
     ->whereNotNull('laravel_controller_method')
-    ->whereNotNull('laravel_middleware')
     ->whereNotNull('http_method')
     ->select([
         'menu_path', 
@@ -42,11 +41,20 @@ $menuTable = DB::table('menu_links')
     ->get();
 
 foreach ($menuTable as $menuRow) {
-    Route::match(
-        [$menuRow->http_method], 
-        $menuRow->menu_path, 
-        [$menuRow->laravel_controller_class, $menuRow->laravel_controller_method]
-    );
+    if (!empty($menuRow->laravel_middleware)) {
+        Route::match(
+            [$menuRow->http_method], 
+            $menuRow->menu_path, 
+            [$menuRow->laravel_controller_class, $menuRow->laravel_controller_method]
+        )
+        ->middleware($menuRow->laravel_middleware);
+    } else {
+        Route::match(
+            [$menuRow->http_method], 
+            $menuRow->menu_path, 
+            [$menuRow->laravel_controller_class, $menuRow->laravel_controller_method]
+        );
+    }
 }
 
 Route::get('/attendance/analysis', function() {
