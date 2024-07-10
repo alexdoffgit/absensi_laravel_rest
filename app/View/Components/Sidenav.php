@@ -26,7 +26,7 @@ class Sidenav extends Component
         if (!empty($userId)) {
             $menus =  $this->menu->getMenuStructure(['userId' => $userId]);
         } else {
-            $menus =  $this->menu->getMenuStructure(['deptId' => 54]);
+            $menus =  [];
         }
 
         return view('components.sidenav', ['menus' => $menus]);
