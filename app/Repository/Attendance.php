@@ -3,13 +3,13 @@
 namespace App\Repository;
 
 use Illuminate\Support\Facades\DB;
-use App\Interfaces\Kehadiran as IKehadiran;
+use App\Interfaces\Attendance as IAttendance;
 use App\Exceptions\EmployeeNotFoundException;
 use App\Interfaces\TimeHelper;
 use App\Exceptions\NegativeNumberException;
 use Illuminate\Support\Collection;
 
-class Kehadiran implements IKehadiran
+class Attendance implements IAttendance
 {
     private $testDateBack = ['2024-01-11', '2024-01-18'];
     private $testDepartment = 80;
@@ -492,9 +492,7 @@ class Kehadiran implements IKehadiran
             ->select(['l.LEAVENAME', 'u.DEFAULTDEPTID', 'u.Name', 'u.USERID'])
             ->get();
 
-        foreach ($variable as $key => $value) {
-            # code...
-        }
+        // TODO: figure out what i was about to do...
     }
 
     /**

@@ -2,12 +2,12 @@
 
 namespace App\Repository;
 
-use App\Interfaces\PersetujuanIzin as PI;
+use App\Interfaces\LeaveApproval as ILeaveApproval;
 use Illuminate\Support\Facades\DB;
 use DateTimeImmutable;
 
 
-class PersetujuanIzin implements PI
+class LeaveApproval implements ILeaveApproval
 {
     public function daftarIzin($userid)
     {

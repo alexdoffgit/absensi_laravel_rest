@@ -3,12 +3,12 @@
 namespace App\Repository;
 
 use App\Exceptions\EmployeeNotFoundException;
-use App\Interfaces\Karyawan as KI;
+use App\Interfaces\Employee as IEmployee;
 use Illuminate\Support\Facades\DB;
 use DateTimeImmutable;
 use DateInterval;
 
-class Karyawan implements KI
+class Employee implements IEmployee
 {
     /**
      * @return array{start: DateTimeImmutable, end: DateTimeImmutable}

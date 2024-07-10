@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface PersetujuanIzin
+interface LeaveApproval
 {
     public function permitSummaries($userId);
     public function permitDetail($penyetujuAbsensiId, $absensiId, $penanggungJawabId);

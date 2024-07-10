@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
-use App\Interfaces\PengajuanIzin as PI;
+use App\Interfaces\LeaveSubmission as ILeaveSubmission;
 use Illuminate\Support\Facades\DB;
 
-class PengajuanIzin implements PI
+class LeaveSubmission implements ILeaveSubmission
 {
     public function create($karyawanId, $requestData)
     {

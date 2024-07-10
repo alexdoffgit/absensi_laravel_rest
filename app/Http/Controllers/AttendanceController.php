@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Interfaces\Kehadiran as IKehadiran;
+use App\Interfaces\Attendance as IAttendance;
 use App\Interfaces\TimeHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Interfaces\Karyawan;
+use App\Interfaces\Employee;
 
-class Kehadiran extends Controller
+class AttendanceController extends Controller
 {
     public function __construct(
-        private IKehadiran $store,
+        private IAttendance $store,
         private TimeHelper $timeHelper,
-        private Karyawan $karyawan
+        private Employee $karyawan
     ) {}
 
     public function index(Request $request, $uid) 

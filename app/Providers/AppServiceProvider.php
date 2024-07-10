@@ -8,26 +8,26 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 
-use App\Interfaces\Karyawan as KI;
-use App\Repository\Karyawan as KR;
+use App\Interfaces\Employee as IEmployee;
+use App\Repository\Employee as EmployeeRepo;
 
-use App\Interfaces\PengajuanIzin as PI;
-use App\Repository\PengajuanIzin as PR;
+use App\Interfaces\LeaveSubmission as ILeaveSubmission;
+use App\Repository\LeaveSubmission as LeaveSubmissionRepo;
 
-use App\Interfaces\PersetujuanIzin as PRIZI;
-use App\Repository\PersetujuanIzin as PRIZR;
+use App\Interfaces\LeaveApproval as ILeaveApproval;
+use App\Repository\LeaveApproval as LeaveApprovalRepo;
 
-use App\Interfaces\Authentication as AUI;
-use App\Repository\Authentication as AUR;
+use App\Interfaces\Authentication as IAuthentication;
+use App\Repository\Authentication as AuthenticationRepo;
 
-use App\Interfaces\PermitTracking as PTI;
-use App\Repository\PermitTracking as PTR;
+use App\Interfaces\PermitTracking as IPermitTracking;
+use App\Repository\PermitTracking as PermitTrackingRepo;
 
-use App\Interfaces\TimeHelper as ITH;
-use App\Repository\TimeHelper as RTH;
+use App\Interfaces\TimeHelper as ITimeHelper;
+use App\Repository\TimeHelper as TimeHelperRepo;
 
-use App\Interfaces\Kehadiran as IKE;
-use App\Repository\Kehadiran as RKE;
+use App\Interfaces\Attendance as IAttendance;
+use App\Repository\Attendance as AttendanceRepo;
 
 use App\Interfaces\Schedule as ISchedule;
 use App\Repository\Schedule as ScheduleRepo;
@@ -42,13 +42,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(KI::class, KR::class);
-        $this->app->bind(PI::class, PR::class);
-        $this->app->bind(PRIZI::class, PRIZR::class);
-        $this->app->bind(AUI::class, AUR::class);
-        $this->app->bind(PTI::class, PTR::class);
-        $this->app->bind(ITH::class, RTH::class);
-        $this->app->bind(IKE::class, RKE::class);
+        $this->app->bind(IAttendance::class, AttendanceRepo::class);
+        $this->app->bind(IEmployee::class, EmployeeRepo::class);
+        $this->app->bind(ILeaveSubmission::class, LeaveSubmissionRepo::class);
+        $this->app->bind(IAuthentication::class, AuthenticationRepo::class);
+        $this->app->bind(ILeaveApproval::class, LeaveApprovalRepo::class);
+        $this->app->bind(ITimeHelper::class, TimeHelperRepo::class);
+        $this->app->bind(IPermitTracking::class, PermitTrackingRepo::class);
         $this->app->bind(ISchedule::class, ScheduleRepo::class);
         $this->app->bind(IMenu::class, MenuRepo::class);
     }

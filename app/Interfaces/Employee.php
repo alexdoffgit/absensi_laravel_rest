@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface Karyawan 
+interface Employee 
 {
     public function getPresensi($userId, $week);
     public function getAbsensi($userId);

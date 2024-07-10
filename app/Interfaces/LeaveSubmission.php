@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface PengajuanIzin
+interface LeaveSubmission
 {
     public function create($karyawanId, $requestData);
     public function persetujuanIzin($status, $atasanid, $listizinid);
