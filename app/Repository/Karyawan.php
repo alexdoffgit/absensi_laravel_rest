@@ -142,7 +142,7 @@ class Karyawan implements KI
 
     /**
      * @param int $uid
-     * @return 'hr'|'manager'|'staff'
+     * @return 'hr'|'manager'|'staff'|'IT'
      * @throws App\Exceptions\EmployeeNotFoundException
      */
     public function getRoles($uid)
@@ -162,13 +162,16 @@ class Karyawan implements KI
             throw new EmployeeNotFoundException($uid);
         }
 
-        if($departmentFromTable->DEPTID == 54) {
+        if($departmentFromTable->DEPTID === 54) {
             return 'hr';
         } else if(
             $departmentFromTable->DLEVEL >= 1.0 && 
             $departmentFromTable->DLEVEL < $lowestDepartmentLevel) {
                 return 'manager';
-        } else {
+        } else if($departmentFromTable->DEPTID === 159) {
+            return 'IT';
+        }
+        else {
             return 'staff';
         }
     }

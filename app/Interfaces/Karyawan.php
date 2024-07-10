@@ -10,7 +10,7 @@ interface Karyawan
     
     /**
      * @param int $uid
-     * @return 'hr'|'manager'|'staff'
+     * @return 'hr'|'manager'|'staff'|'IT'
      * @throws App\Exceptions\EmployeeNotFoundException
      */
     public function getRoles($uid);
