@@ -14,7 +14,7 @@
                 <x-sidenav />
             </div>
             <div class="col-10 g-0">
-                <x-top-nav :$empName />
+                <x-top-nav />
                 {{ $slot }}
             </div>
         </div>
