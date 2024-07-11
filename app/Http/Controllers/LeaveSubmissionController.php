@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Interfaces\PengajuanIzin as IPengajuanIzin;
+use App\Interfaces\LeaveSubmission;
 use Illuminate\Support\Facades\DB;
 
 class PengajuanIzin extends Controller
 {
-    public function __construct(private IPengajuanIzin $store) { }
+    public function __construct(private LeaveSubmission $store) { }
 
     public function createView(Request $request, $karyawanid) {
 

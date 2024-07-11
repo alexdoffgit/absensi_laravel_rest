@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Repository;
-use App\Interfaces\PermitTracking as IPT;
+use App\Interfaces\LeaveTracking as ILeaveTracking;
 use Illuminate\Support\Facades\DB;
 
-class PermitTracking implements IPT
+class LeaveTracking implements ILeaveTracking
 {
     public function summary($uid)
     {

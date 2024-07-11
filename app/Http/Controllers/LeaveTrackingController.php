@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Interfaces\PermitTracking;
+use App\Interfaces\LeaveTracking;
 
-class PermitTrackingController extends Controller
+class LeaveTrackingController extends Controller
 {
-    public function __construct(private PermitTracking $store) {}
+    public function __construct(private LeaveTracking $store) {}
 
-    public function permitSummary(Request $request, $uid)
+    public function leaveSummaries(Request $request, $uid)
     {
         $jabatanTable = DB::table('temp_user_jabatan')
             ->select('jabatan')
@@ -26,7 +26,7 @@ class PermitTrackingController extends Controller
         ]);
     }
 
-    public function permitDetail(Request $request, $absentid, $uid)
+    public function leaveDetail(Request $request, $absentid, $uid)
     {
         $jabatanTable = DB::table('temp_user_jabatan')
             ->select('jabatan')

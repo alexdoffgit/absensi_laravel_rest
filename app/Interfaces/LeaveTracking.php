@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface PermitTracking
+interface LeaveTracking
 {
     public function summary($uid);
     public function detail($absensiId);
