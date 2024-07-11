@@ -4,11 +4,11 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Interfaces\PersetujuanIzin;
+use App\Interfaces\LeaveApproval;
 
-class Perizinan extends Controller
+class LeaveController extends Controller
 {
-    public function __construct(private PersetujuanIzin $store) {}
+    public function __construct(private LeaveApproval $store) {}
 
     public function permitSummaries(Request $request, $hrid)
     {
