@@ -7,7 +7,10 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="text-decoration-none text-white nav-link">
+            <a 
+             href="{{ url('/logout') }}" 
+             class="text-decoration-none text-white nav-link"
+             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="bi bi-box-arrow-right"></i>
                 <span class="ms-1">Log out</span>
             </a>
@@ -19,4 +22,7 @@
             </a>
         </li>
     </ul>
+    <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+        {{ csrf_field() }}
+    </form>
 </div>

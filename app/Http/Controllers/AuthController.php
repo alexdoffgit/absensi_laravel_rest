@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Interfaces\Authentication;
-use App\Interfaces\Karyawan;
+use App\Interfaces\Employee;
 
 class AuthController extends Controller
 {
     public function __construct(
         private Authentication $au,
-        private Karyawan $karyawan
+        private Employee $employee
     ) {
     }
 
@@ -33,14 +33,7 @@ class AuthController extends Controller
             return back()->with('invalid', true);
         } else {
             session(['userId' => $uid]);
-            $roles = $this->karyawan->getRoles($uid);
-            if ($roles == 'hr') {
-                return redirect('/hr/attendance/analysis');
-            } else if ($roles == 'manager') {
-                return redirect('/manager/attendande/analysis');
-            } else {
-                return redirect('/attendance/analysis');
-            }
+            return redirect('/attendance/analysis');
         }
     }
 
@@ -59,5 +52,12 @@ class AuthController extends Controller
         $uid = $this->au->register($formdata['username'], $formdata['passwd']);
 
         return redirect(url("/{$uid}/kehadiran"));
+    }
+
+    public function logout()
+    {
+        session()->forget('userId');
+        session()->invalidate();
+        return redirect('/');
     }
 }
