@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Interfaces\LeaveSubmission;
 use Illuminate\Support\Facades\DB;
 
-class PengajuanIzin extends Controller
+class LeaveSubmissionController extends Controller
 {
     public function __construct(private LeaveSubmission $store) { }
 

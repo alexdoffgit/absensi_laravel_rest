@@ -17,9 +17,6 @@ function createCalendar(uid) {
     headerToolbar: {
       start: 'title',
       right: false
-    },
-    events: {
-      url: `/api/${uid}/kehadiran`
     }
   });
 

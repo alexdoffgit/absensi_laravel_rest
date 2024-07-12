@@ -16,15 +16,16 @@ class AttendanceController extends Controller
         private Employee $karyawan
     ) {}
 
-    public function index(Request $request, $uid) 
+    public function index(Request $request) 
     {
+        $uid = session()->get('userId');
         $position = $this->karyawan->getRoles(intval($uid));
         $userinfo = DB::table('userinfo')
             ->where('USERID', '=', $uid)
             ->select('Name')
             ->first();
 
-        return view('kehadiran', [
+        return view('attendance', [
             'position' => $position,
             'uid' => $uid,
             'empName' => $userinfo->Name
