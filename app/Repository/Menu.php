@@ -6,8 +6,6 @@ use App\Interfaces\Menu as IMenu;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 
-use function PHPSTORM_META\map;
-
 class Menu implements IMenu
 {
     /**
@@ -20,10 +18,6 @@ class Menu implements IMenu
      */
     public function getMenuStructure($options)
     {
-        $options = [
-            'deptId' => 54
-        ];
-
         $specificUserMenu = DB::table('menu_links as ml')
             ->join('menu_links_roles as mlr', 'ml.id', '=', 'mlr.menu_link_id')
             ->join('menu_seq as ms', 'ml.id', '=', 'ms.menu_link_id');
