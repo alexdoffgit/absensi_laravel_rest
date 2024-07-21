@@ -20,7 +20,8 @@ class Menu implements IMenu
     {
         $specificUserMenu = DB::table('menu_links as ml')
             ->join('menu_links_roles as mlr', 'ml.id', '=', 'mlr.menu_link_id')
-            ->join('menu_seq as ms', 'ml.id', '=', 'ms.menu_link_id');
+            ->join('menu_seq as ms', 'ml.id', '=', 'ms.menu_link_id')
+            ->where('ml.route_type', '=', 'web');
 
         if (array_key_exists('userId', $options)) {
             $specificUserMenu = $specificUserMenu->where('mlr.user_id', '=', $options['userId']);
@@ -42,8 +43,7 @@ class Menu implements IMenu
             'ml.laravel_controller_method',
             'ms.menu_level',
             'ms.parent'
-        ])
-            ->get();
+        ]);
 
         $emptyMenu = DB::table('menu_seq as ms')
             ->leftJoin('menu_links as ml', 'ms.menu_link_id', '=', 'ml.id')
@@ -56,13 +56,13 @@ class Menu implements IMenu
                 'ml.laravel_controller_method',
                 'ms.menu_level',
                 'ms.parent'
-            ])
-            ->get();
+            ])->union($specificUserMenu);
 
         $genericMenu = DB::table('menu_links as ml')
             ->join('menu_links_roles as mlr', 'ml.id', '=', 'mlr.menu_link_id')
             ->join('menu_seq as ms', 'ml.id', '=', 'ms.menu_link_id')
             ->where('mlr.all_can_access', '=', 1)
+            ->where('ml.route_type', '=', 'web')
             ->select([
                 'ms.id as seq_id',
                 'ml.menu_path',
@@ -72,60 +72,53 @@ class Menu implements IMenu
                 'ms.menu_level',
                 'ms.parent'
             ])
-            ->get();
+            ->union($emptyMenu);
+        
+        $combinedMenu = $genericMenu
+                ->get();
 
-        $rootMenus = $emptyMenu->map(function ($item) {
-            return $item->menu_name;
-        })->toArray();
 
-        $nestableGenericMenu = collect([]);
-        $independentGenericMenu = collect([]);
+        $potentialNestableMenu = $combinedMenu->reject(function($item) {
+            return $item->parent == null && is_string($item->menu_path);
+        })
+        ->values()
+        ->map(function($item) {
+            return (array) $item;
+        })
+        ->map(function($item) {
+            $item['menu_name'] = explode('.', $item['menu_name']);
+            $item['menu_name'] = $item['menu_name'][count($item['menu_name']) - 1];
+            return $item;
+        })
+        ->toArray();
 
-        foreach ($genericMenu as $value) {
-            $matched = false;
-            foreach ($rootMenus as $prefix) {
-                if (strpos($value->menu_name, $prefix) === 0) {
-                    $nestableGenericMenu->push($value);
-                    $matched = true;
-                    break;
+        $independentMenu = $combinedMenu->filter(function($item) {
+            return $item->parent == null && is_string($item->menu_path);
+        })
+        ->values()
+        ->map(function($item) {
+            return (array) $item;
+        })
+        ->toArray();
+
+        $menuTreeIncomplete = $this->menuTree($potentialNestableMenu);
+        $menus = array_merge($menuTreeIncomplete, $independentMenu);
+
+        return $menus;
+    }
+
+    private function menuTree(array $potentialNestableMenu, $parentId = null)
+    {
+        $tree = [];
+        foreach ($potentialNestableMenu as $item) {
+            if($item['parent'] == $parentId) {
+                $children = $this->menuTree($potentialNestableMenu, $item['seq_id']);
+                if(count($children) > 0) {
+                    $item['children'] = $children;
                 }
-            }
-            if (!$matched) {
-                $independentGenericMenu->push($value);
+                array_push($tree, $item);
             }
         }
-        unset($prefix);
-        unset($value);
-
-        $menus = $specificUserMenu->merge($emptyMenu)->merge($nestableGenericMenu);
-        $menus = $menus->map(function ($item) {
-            if (empty($item->parent)) {
-                $item->children = [];
-            }
-            return $item;
-        });
-        $menus = $menus->pipe(function (Collection $collection) {
-            $rootItems = $collection->filter(function ($item) {
-                return property_exists($item, 'children');
-            });
-
-            foreach ($rootItems as $item1) {
-                foreach ($collection as $item2) {
-                    if ($item1->seq_id === $item2->parent) {
-                        $splittedMenu = explode('.', $item2->menu_name);
-                        $parentName = $splittedMenu[0];
-                        $childName = $splittedMenu[1];
-                        $item2->menu_name = $childName;
-                        $item2->parent_name = $parentName;
-                        $item1->children[] = $item2;
-                    }
-                }
-            }
-
-            return $rootItems;
-        })
-            ->merge($independentGenericMenu);
-
-        return $menus->toArray();
+        return $tree;
     }
 }

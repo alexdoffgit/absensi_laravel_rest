@@ -1,4 +1,4 @@
-<div class="container-fluid g-0 bg-dark py-3">
+<div class="bg-dark py-3">
     <ul class="nav justify-content-end">
         <li class="nav-item">
             <a href="#" class="d-block text-decoration-none text-white nav-link">

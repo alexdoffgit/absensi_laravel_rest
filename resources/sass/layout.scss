@@ -1,0 +1,14 @@
+body.absensi-layout-body {
+    .absensi-layout-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        .absensi-layout-main {
+            flex-basis: 80%;
+            flex-grow: 1;
+            flex-shrink: 0;
+            display: grid;
+            grid-template-columns: 20% 80%;
+        }
+    }
+}

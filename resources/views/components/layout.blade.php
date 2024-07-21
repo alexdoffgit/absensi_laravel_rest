@@ -5,16 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $title }}</title>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-    {{ $viteSlot ?? null }}
+    @vite('resources/sass/layout.scss')
+    {{ $viteslot ?? null }}
 </head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-2 g-0">
-                <x-sidenav />
-            </div>
-            <div class="col-10 g-0">
-                <x-top-nav />
+<body class="absensi-layout-body">
+    <div class="absensi-layout-container">
+        <x-topnav />
+        <div class="absensi-layout-main">
+            <x-sidenav />
+            <div class="container">
                 {{ $slot }}
             </div>
         </div>

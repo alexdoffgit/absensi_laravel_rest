@@ -23,9 +23,9 @@ class TopNav extends Component
         $userId = $userId ?? -1;
         $userinfoTable = DB::table('userinfo')
             ->where('USERID', '=', $userId)
-            ->select(['Name'])
+            ->select(['fullname'])
             ->first();
-        $empName = $userinfoTable->Name ?? '';
+        $empName = $userinfoTable->fullname ?? '';
         return view('components.top-nav', ['empName' => $empName]);
     }
 }

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 use App\Interfaces\Menu;
+use Illuminate\Support\Facades\DB;
 
 class Sidenav extends Component
 {
@@ -24,11 +25,15 @@ class Sidenav extends Component
     {
         $userId = session()->get('userId');
         if (!empty($userId)) {
-            $menus =  $this->menu->getMenuStructure(['userId' => $userId]);
+            $user = DB::table('userinfo')
+                ->where('USERID', '=', $userId)
+                ->select('DEFAULTDEPTID')
+                ->first();
+            $menuTree = $this->menu->getMenuStructure(['deptId' => $user->DEFAULTDEPTID]);
         } else {
-            $menus =  [];
+            $menuTree = $this->menu->getMenuStructure(['dlevel' => 4.0]);
         }
 
-        return view('components.sidenav', ['menus' => $menus]);
+        return view('components.sidenav', ['menus' => $menuTree]);
     }
 }
