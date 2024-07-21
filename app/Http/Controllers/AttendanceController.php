@@ -22,13 +22,13 @@ class AttendanceController extends Controller
         $position = $this->karyawan->getRoles(intval($uid));
         $userinfo = DB::table('userinfo')
             ->where('USERID', '=', $uid)
-            ->select('Name')
+            ->select('fullname')
             ->first();
 
         return view('attendance', [
             'position' => $position,
             'uid' => $uid,
-            'empName' => $userinfo->Name
+            'empName' => $userinfo->fullname
         ]);
     }
 
