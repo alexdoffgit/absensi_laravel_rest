@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Interfaces\Authentication;
 use App\Interfaces\Employee;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -20,6 +22,26 @@ class AuthController extends Controller
         return view('login');
     }
 
+    public function loginApi(Request $request)
+    {
+        $formdata = $request->validate([
+            'username' => 'required',
+            'passwd' => 'required'
+        ]);
+
+        if (
+            Auth::attempt([
+                'Name' => $formdata['username'],
+                'PASSWORD' => $formdata['passwd']
+            ])
+        ) {
+            $request->session()->regenerate();
+            return response();
+        } else {
+            abort(401, 'invalid credential');
+        }
+    }
+
     public function login(Request $request)
     {
         $formdata = $request->validate([
@@ -27,13 +49,23 @@ class AuthController extends Controller
             'passwd' => 'required'
         ]);
 
-        $uid = $this->au->verifyUser($formdata['username'], $formdata['passwd']);
+        $uid = DB::table('userinfo')
+            ->where('fullname', '=', $formdata['username'])
+            ->select(['USERID'])
+            ->first()
+            ->USERID;
 
-        if (empty($uid)) {
-            return back()->with('invalid', true);
-        } else {
+        if (
+            Auth::attempt([
+                'fullname' => $formdata['username'],
+                'password' => $formdata['passwd']
+            ])
+        ) {
+            $request->session()->regenerate();
             session(['userId' => $uid]);
             return redirect('/attendance/analysis');
+        } else {
+            return back()->with('invalid', true);
         }
     }
 
