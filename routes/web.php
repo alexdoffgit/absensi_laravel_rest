@@ -9,18 +9,11 @@ Route::prefix('test')->group(function () {
     Route::get('/', [Test::class, 'index']);
 });
 
-
-// Route::get('/hr/attendance/analysis', [HREmployeeAttendanceController::class, 'index'])
-//     ->middleware(HRMenuAccessMiddleware::class);
-
-// Route::get('/manager/attendance/analysis', [ManagerEmployeeAttendanceController::class, 'index'])
-//     ->middleware(ManagerAccessMiddleware::class);
-
-
-$menuTable = $menuTable = DB::table('menu_links as ml')
+$menuTable = DB::table('menu_links as ml')
     ->whereNotNull('ml.laravel_controller_class')
     ->whereNotNull('ml.laravel_controller_method')
     ->whereNotNull('ml.http_method')
+    ->where('ml.route_type', '=', 'web')
     ->select([
         'ml.id',
         'ml.menu_path',
