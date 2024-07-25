@@ -16,7 +16,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="d-block text-decoration-none text-white nav-link">
+            <a href="{{ url('/settings') }}" class="d-block text-decoration-none text-white nav-link">
                 <i class="bi bi-gear-fill"></i>
                 <span class="ms-1">Settings</span>
             </a>
