@@ -13,9 +13,7 @@
         <x-topnav />
         <div class="absensi-layout-main">
             <x-sidenav />
-            <div class="container">
-                {{ $slot }}
-            </div>
+            {{ $slot }}
         </div>
     </div>
 </body>
