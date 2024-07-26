@@ -5,11 +5,11 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Interfaces\Karyawan;
+use App\Interfaces\Employee;
 
 class ITAdminMiddleware
 {
-    public function __construct(private Karyawan $karyawan) {}
+    public function __construct(private Employee $employee) {}
 
     /**
      * Handle an incoming request.
@@ -24,7 +24,7 @@ class ITAdminMiddleware
             return redirect('/');
         }
 
-        $roles = $this->karyawan->getRoles($userId);
+        $roles = $this->employee->getRoles($userId);
 
         if($roles != 'IT') {
             return back();
