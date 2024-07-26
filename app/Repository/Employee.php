@@ -148,10 +148,9 @@ class Employee implements IEmployee
     public function getRoles($uid)
     {
         $departmentFromTable = DB::table('userinfo as u')
-            ->join('departments as d', 'u.DEFAULTDEPTID', '=', 'd.DEPTID')
-            ->join('deptseq as ds', 'd.DEPTID', '=', 'ds.DEPTID')
+            ->join('deptseq as ds', 'u.DEFAULTDEPTID', '=', 'ds.DEPTID')
             ->where('u.USERID', '=', $uid)
-            ->select(['d.DEPTID', 'ds.DLEVEL'])
+            ->select(['ds.DEPTID', 'ds.DLEVEL'])
             ->first();
         
         $lowestDepartmentLevel = DB::table('deptseq')
@@ -164,14 +163,13 @@ class Employee implements IEmployee
 
         if($departmentFromTable->DEPTID === 54) {
             return 'hr';
+        } else if($departmentFromTable->DEPTID === 159) {
+            return 'IT';
         } else if(
             $departmentFromTable->DLEVEL >= 1.0 && 
             $departmentFromTable->DLEVEL < $lowestDepartmentLevel) {
                 return 'manager';
-        } else if($departmentFromTable->DEPTID === 159) {
-            return 'IT';
-        }
-        else {
+        } else {
             return 'staff';
         }
     }
