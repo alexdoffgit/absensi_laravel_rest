@@ -38,7 +38,7 @@ class Menu implements IMenu
         $specificUserMenu = $specificUserMenu->select([
             'ms.id as seq_id',
             'ml.menu_path',
-            'ms.menu_name',
+            'ms.menu_name_lang_ID as menu_name',
             'ml.laravel_controller_class',
             'ml.laravel_controller_method',
             'ms.menu_level',
@@ -51,7 +51,7 @@ class Menu implements IMenu
             ->select([
                 'ms.id as seq_id',
                 'ml.menu_path',
-                'ms.menu_name',
+                'ms.menu_name_lang_ID as menu_name',
                 'ml.laravel_controller_class',
                 'ml.laravel_controller_method',
                 'ms.menu_level',
@@ -66,7 +66,7 @@ class Menu implements IMenu
             ->select([
                 'ms.id as seq_id',
                 'ml.menu_path',
-                'ms.menu_name',
+                'ms.menu_name_lang_ID as menu_name',
                 'ml.laravel_controller_class',
                 'ml.laravel_controller_method',
                 'ms.menu_level',
@@ -92,8 +92,11 @@ class Menu implements IMenu
         })
         ->toArray();
 
-        $independentMenu = $combinedMenu->filter(function($item) {
+        $independentMenuNoSettings = $combinedMenu->filter(function($item) {
             return $item->parent == null && is_string($item->menu_path);
+        })
+        ->reject(function($item) {
+            return $item->menu_name === 'Pengaturan';
         })
         ->values()
         ->map(function($item) {
@@ -102,7 +105,7 @@ class Menu implements IMenu
         ->toArray();
 
         $menuTreeIncomplete = $this->menuTree($potentialNestableMenu);
-        $menus = array_merge($menuTreeIncomplete, $independentMenu);
+        $menus = array_merge($menuTreeIncomplete, $independentMenuNoSettings);
 
         return $menus;
     }
