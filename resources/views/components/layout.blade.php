@@ -5,8 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $title }}</title>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-    @vite('resources/sass/layout.scss')
-    {{ $viteslot ?? null }}
 </head>
 <body class="absensi-layout-body">
     <div class="absensi-layout-container">
@@ -17,5 +15,4 @@
         </div>
     </div>
 </body>
-{{ $script ?? null }}
 </html>
