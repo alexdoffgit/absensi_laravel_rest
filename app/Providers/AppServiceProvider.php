@@ -20,8 +20,8 @@ use App\Repository\LeaveApproval as LeaveApprovalRepo;
 use App\Interfaces\Authentication as IAuthentication;
 use App\Repository\Authentication as AuthenticationRepo;
 
-use App\Interfaces\PermitTracking as IPermitTracking;
-use App\Repository\PermitTracking as PermitTrackingRepo;
+use App\Interfaces\LeaveTracking as ILeaveTracking;
+use App\Repository\LeaveTracking as LeaveTrackingRepo;
 
 use App\Interfaces\TimeHelper as ITimeHelper;
 use App\Repository\TimeHelper as TimeHelperRepo;
@@ -34,6 +34,11 @@ use App\Repository\Schedule as ScheduleRepo;
 
 use App\Interfaces\Menu as IMenu;
 use App\Repository\Menu as MenuRepo;
+use App\Repository\Json\Menu as MenuMemoryRepo;
+
+use App\Interfaces\AccessManagement as IAccessManagement;
+use App\Repository\AccessManagement as AccessManagementRepo;
+use App\Repository\Json\AccessManagement as AccessManagementMemory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -48,9 +53,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IAuthentication::class, AuthenticationRepo::class);
         $this->app->bind(ILeaveApproval::class, LeaveApprovalRepo::class);
         $this->app->bind(ITimeHelper::class, TimeHelperRepo::class);
-        $this->app->bind(IPermitTracking::class, PermitTrackingRepo::class);
+        $this->app->bind(ILeaveTracking::class, LeaveTrackingRepo::class);
         $this->app->bind(ISchedule::class, ScheduleRepo::class);
-        $this->app->bind(IMenu::class, MenuRepo::class);
+        $this->app->bind(IMenu::class, MenuMemoryRepo::class);
+        $this->app->bind(IAccessManagement::class, AccessManagementMemory::class);
+
+        if ($this->app->environment('local')) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
     }
 
     /**
