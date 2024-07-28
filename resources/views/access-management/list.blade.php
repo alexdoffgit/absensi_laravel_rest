@@ -17,13 +17,24 @@
                             <td>{{ $menu['menu_name'] }}</td>
                             <td>{{ $menu['menu_path'] }}</td>
                             <td>
-                                <i class="bi bi-pencil-square"></i>
-                                <i class="bi bi-trash-fill"></i>
+                                <a href="/access-management/{{ $menu['id'] }}">
+                                    <i class="bi bi-eye-fill"></i>
+                                </a>
+                                <a href="/access-management/{{ $menu['id'] }}/update">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="/access-management/{{ $menu['id'] }}" onclick="event.preventDefault(); document.getElementById('delete').submit();">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+        <form action="/access-management/{{ $menu['id'] }}" method="POST" style="display: none;" id="delete">
+            @csrf
+            @method('DELETE')
+        </form>
     </div>
 </x-layout>
