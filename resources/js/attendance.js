@@ -4,28 +4,6 @@ import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 
 /**
  * 
- * @param {number} uid 
- * @returns {Calendar}
- */
-function createCalendar(uid) {
-  const calendarEl = document.getElementById("calendar");
-
-  let calendar = new Calendar(calendarEl, {
-    plugins: [dayGridPlugin, bootstrap5Plugin],
-    initialView: 'dayGridMonth',
-    themeSystem: 'bootstrap5',
-    headerToolbar: {
-      start: 'title',
-      right: false
-    }
-  });
-
-  return calendar
-}
-
-
-/**
- * 
  * @param {string} isoDate a date that determined the year and month in ISO8601 string
  * @return {{start: string, end: string}} start and ending date in ISO8601 string
  */
@@ -72,5 +50,15 @@ function calendarEventHTML(timeRange) {
   `;
 }
 
+const calendarEl = document.getElementById("calendar");
 
-export { createCalendar }
+let calendar = new Calendar(calendarEl, {
+plugins: [dayGridPlugin, bootstrap5Plugin],
+initialView: 'dayGridMonth',
+themeSystem: 'bootstrap5',
+headerToolbar: {
+    start: 'title',
+    right: false
+}
+});
+calendar.render();
