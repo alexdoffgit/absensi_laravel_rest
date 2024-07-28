@@ -60,17 +60,6 @@
 </head>
 <body>
     <div class="layout-container">
-        <div class="nav-container">
-            @if($jabatan == 'staff')
-                <x-nav-karyawan :$karyawanId />
-            @elseif ($jabatan == 'atasan')
-                <x-nav-atasan :$karyawanId />
-            @elseif ($jabatan == 'hr')
-                <x-nav-hr :$karyawanId />
-            @else
-    
-            @endif
-        </div>
         <div class="content-container">
             <div class="pseudo-padding">
                 <h1>Permit Tracking</h1>

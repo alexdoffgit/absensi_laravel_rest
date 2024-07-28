@@ -126,7 +126,7 @@ class LeaveSubmission implements ILeaveSubmission
             ->where('DEPTID', '=', $userinfoTable->DEFAULTDEPTID)
             ->first();
         $userinfoAtasanTable = DB::table('userinfo')
-            ->select('USERID', 'Name')
+            ->select('USERID', 'fullname')
             ->where('DEFAULTDEPTID', '=', $departmentTable->SUPDEPTID)
             ->get();
 

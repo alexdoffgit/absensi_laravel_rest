@@ -5,14 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Interfaces\LeaveSubmission;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveSubmissionController extends Controller
 {
     public function __construct(private LeaveSubmission $store) { }
 
-    public function createView(Request $request, $karyawanid) {
+    public function createView(Request $request) {
+        $karyawanid = Auth::user()->USERID;
 
-        return view('pengajuan-izin', [
+        return view('leave-submission', [
             'karyawanId' => $karyawanid,
             'semuaIzin' => $this->store->tipeIzin(),
             'semuaAtasan' => $this->store->getAtasanByKaryawanId($karyawanid)
