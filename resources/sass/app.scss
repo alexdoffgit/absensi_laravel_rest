@@ -1,8 +1,11 @@
-// Fonts
-// @import url('https://fonts.bunny.net/css?family=Nunito');
-
-// // Bootstrap
-// @import '../../node_modules/bootstrap/scss/bootstrap';
+/* 
+REGION
+    // Fonts
+    // @import url('https://fonts.bunny.net/css?family=Nunito');
+    // // Bootstrap
+    // @import '../../node_modules/bootstrap/scss/bootstrap';
+ENDREGION 
+*/
 
 @import '../../node_modules/bootstrap/scss/functions';
 
@@ -35,7 +38,13 @@ $spacers: map-merge($spacers, $my-spacers);
 @import "../../node_modules/bootstrap/scss/nav";
 @import "../../node_modules/bootstrap/scss/navbar";
 @import "../../node_modules/bootstrap/scss/helpers";
+@import "../../node_modules/bootstrap/scss/tables";
 
 @import "../../node_modules/bootstrap/scss/utilities/api";
 
+// app specific styling
+
+@import "layout";
+@import "leave-submission";
+@import "access-management/show";
 
