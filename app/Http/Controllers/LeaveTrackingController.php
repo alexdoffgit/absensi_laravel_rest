@@ -5,23 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\LeaveTracking;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveTrackingController extends Controller
 {
     public function __construct(private LeaveTracking $store) {}
 
-    public function leaveSummaries(Request $request, $uid)
+    public function leaveSummaries(Request $request)
     {
-        $jabatanTable = DB::table('temp_user_jabatan')
-            ->select('jabatan')
-            ->where('userid', '=', intval($uid))
-            ->first();
+        $uid = intval(Auth::user()->USERID);
 
         $permitSummaryMatrix = $this->store->summary(intval($uid));
 
         return view('permit-tracking', [
             'karyawanId' => $uid,
-            'jabatan' => $jabatanTable->jabatan,
             'permitSummaryMatrix' => $permitSummaryMatrix
         ]);
     }
