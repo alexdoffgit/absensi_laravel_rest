@@ -5,12 +5,12 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Interfaces\Karyawan;
+use App\Interfaces\Employee;
 use App\Exceptions\EmployeeNotFoundException;
 
 class ManagerAccessMiddleware
 {
-    public function __construct(private Karyawan $employee) {}
+    public function __construct(private Employee $employee) {}
     /**
      * Handle an incoming request.
      *
