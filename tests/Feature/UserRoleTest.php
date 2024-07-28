@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use App\Repository\Karyawan;
+use App\Repository\Employee;
 
 class UserRoleTest extends TestCase
 {
@@ -19,7 +19,7 @@ class UserRoleTest extends TestCase
         $usersManager = [54, 215, 117];
         $userStaff = 971;
         // act
-        $k = new Karyawan();
+        $k = new Employee();
         $roleHR = $k->getRoles($userHR);
         $rolesManager = [];
         foreach ($usersManager as $value1) {
