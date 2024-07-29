@@ -24,7 +24,7 @@ class LeaveSubmissionController extends Controller
     public function createWeb(Request $request, $karyawanid) {
         $data = $request->validate([
             'tanggal_pengajuan' => 'required|date_format:Y-m-d',
-            'mulai_izin' => 'required|date_format:Y-m-d',
+            'daterange' => 'required|date_format:Y-m-d',
             'selesai_izin' => 'required|date_format:Y-m-d',
             'atasan' => 'numeric',
             'izin' => 'numeric',

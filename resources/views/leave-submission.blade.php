@@ -7,15 +7,9 @@
                 <label for="tanggal_pengajuan" class="form-label">Tanggal Pengajuan</label>
                 <input type="text" readonly class="form-control" id="tanggal_pengajuan" name="tanggal_pengajuan">
             </div>
-            <div class="row mb-3 mt-3">
-                <div class="col-6">
-                    <label for="mulai_izin" class="form-label">Tanggal Mulai Izin</label>
-                    <input type="date" class="form-control" id="mulai_izin" name="mulai_izin">
-                </div>
-                <div class="col-6">
-                    <label for="selesai_izin" class="form-label">Tanggal Selesai Izin</label>
-                    <input type="date" class="form-control" id="selesai_izin" name="selesai_izin">
-                </div>
+            <div class="mb-3 mt-3">
+                <label for="daterange" class="form-label">Tanggal Izin</label>
+                <input type="text" class="form-control" id="daterange" name="daterange">
             </div>
             <div class="mb-3 mt-3">
                 <label for="atasan" class="form-label">Nama Atasan</label>
