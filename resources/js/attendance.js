@@ -52,13 +52,15 @@ function calendarEventHTML(timeRange) {
 
 const calendarEl = document.getElementById("calendar");
 
-let calendar = new Calendar(calendarEl, {
-plugins: [dayGridPlugin, bootstrap5Plugin],
-initialView: 'dayGridMonth',
-themeSystem: 'bootstrap5',
-headerToolbar: {
-    start: 'title',
-    right: false
+if(calendarEl) {
+  let calendar = new Calendar(calendarEl, {
+  plugins: [dayGridPlugin, bootstrap5Plugin],
+  initialView: 'dayGridMonth',
+  themeSystem: 'bootstrap5',
+  headerToolbar: {
+      start: 'title',
+      right: false
+  }
+  });
+  calendar.render();
 }
-});
-calendar.render();
