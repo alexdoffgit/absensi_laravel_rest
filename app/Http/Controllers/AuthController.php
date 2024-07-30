@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Interfaces\Authentication;
 use App\Interfaces\Employee;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -49,8 +49,7 @@ class AuthController extends Controller
             'passwd' => 'required'
         ]);
 
-        $uid = DB::table('userinfo')
-            ->where('fullname', '=', $formdata['username'])
+        $uid = User::where('fullname', '=', $formdata['username'])
             ->select(['USERID'])
             ->first()
             ->USERID;
