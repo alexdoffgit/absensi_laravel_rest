@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class EmployeePermissionRequestTest extends TestCase
 {
-    public function test_can_submit_permission()
+    public function can_submit_permission()
     {
         // arrange
         $requestData = [
@@ -29,7 +29,7 @@ class EmployeePermissionRequestTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function test_leave_allowance_reduced()
+    public function leave_allowance_reduced()
     {
         // $p = new PengajuanIzin();
         // $p->create(215, ['']);

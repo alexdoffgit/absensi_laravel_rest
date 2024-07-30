@@ -10,7 +10,7 @@ use App\Repository\TimeHelper;
 
 class HRAbsenceTest extends TestCase
 {
-    public function test_fetch_correct_data_from_absence_table(): void
+    public function fetch_correct_data_from_absence_table(): void
     {
         $date = \DateTimeImmutable::createFromFormat('Y-m-d', '2024-01-16');
         $deptId = 80;

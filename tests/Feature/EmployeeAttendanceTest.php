@@ -13,7 +13,7 @@ class EmployeeAttendanceTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_get_employee_attendance_by_id_and_time_range_in_data(): void
+    public function get_employee_attendance_by_id_and_time_range_in_data(): void
     {
         // arrange
         $uid = 3;

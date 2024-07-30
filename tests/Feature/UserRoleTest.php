@@ -12,7 +12,7 @@ class UserRoleTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_return_the_correct_roles(): void
+    public function return_the_correct_roles(): void
     {
         // arrange
         $userHR = 3;

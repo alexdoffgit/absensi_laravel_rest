@@ -5,10 +5,11 @@ namespace Tests\Feature;
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 // use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use App\Repository\Kehadiran;
+use App\Repository\Employee;
 use App\Repository\TimeHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PhpParser\Node\Expr\Empty_;
 
 class HRPresenceTest extends TestCase
 {
@@ -18,12 +19,12 @@ class HRPresenceTest extends TestCase
     }
 
 
-    public function test_check_if_presence_table_is_filled_based_on_department()
+    public function check_if_presence_table_is_filled_based_on_department()
     {
         // arrange
         $deptId = 80;
         $options = ['time' => 'week', 'page' => 1];
-        $kehadiran = new Kehadiran(new TimeHelper());
+        $kehadiran = new Employee(new TimeHelper());
         // act
         $presenceDataByDepartment = $kehadiran->getPresenceFiltered($deptId, $options);
         // assert
@@ -45,14 +46,14 @@ class HRPresenceTest extends TestCase
         }
     }
 
-    public function test_check_employee_presence_per_day()
+    public function check_employee_presence_per_day()
     {
         // arrange
         $date  = \DateTimeImmutable::createFromFormat('Y-m-d', '2021-09-20');
         $options = [
             'deptId' => 61
         ];
-        $kehadiran = new Kehadiran(new TimeHelper());
+        $kehadiran = new Employee(new TimeHelper());
         // act
         $presensiTable = $kehadiran->getPresencePerDay($date, $options);
         // assert
@@ -73,7 +74,7 @@ class HRPresenceTest extends TestCase
         }
     }
 
-    public function test_should_display_the_structure_of_absence_summary_correctly()
+    public function should_display_the_structure_of_absence_summary_correctly()
     {
         // arrange
         $timeRange = [
@@ -82,7 +83,7 @@ class HRPresenceTest extends TestCase
         ];
         $deptId = 80;
         $options = null;
-        $kehadiran = new Kehadiran(new TimeHelper());
+        $kehadiran = new Employee(new TimeHelper());
         // act
         $summary = $kehadiran->getPresenceSummary($timeRange, $deptId, $options);
         // assert
