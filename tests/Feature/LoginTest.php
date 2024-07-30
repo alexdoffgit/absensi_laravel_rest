@@ -14,12 +14,21 @@ class LoginTest extends TestCase
      */
     public function test_hr_can_login(): void
     {
-        $this->withoutExceptionHandling();
         $response = $this->post('/login', [
             'username' => 'BACHROAN', 
             'passwd' => '0000420'
         ]);
 
         $response->assertRedirect('/attendance/analysis');
+    }
+
+    public function test_redirect_if_data_invalid()
+    {
+        $response = $this->post('/login', [
+            'username' => 'Nulu',
+            'passwd' => 'huh'
+        ]);
+
+        $response->assertRedirect('/');
     }
 }

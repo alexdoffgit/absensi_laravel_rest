@@ -49,17 +49,16 @@ class AuthController extends Controller
             'passwd' => 'required'
         ]);
 
-        $uid = User::where('fullname', '=', $formdata['username'])
-            ->select(['USERID'])
-            ->first()
-            ->USERID;
-
         if (
             Auth::attempt([
                 'fullname' => $formdata['username'],
                 'password' => $formdata['passwd']
             ])
         ) {
+            $uid = User::where('fullname', '=', $formdata['username'])
+                ->select(['USERID'])
+                ->first()
+                ->USERID;
             $request->session()->regenerate();
             session(['userId' => $uid]);
             return redirect('/attendance/analysis');
