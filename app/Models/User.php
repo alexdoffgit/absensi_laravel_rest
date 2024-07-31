@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -43,5 +44,15 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    public function pivot_head_manager(): HasOne
+    {
+        return $this->hasOne(UserManager::class, 'head_manager_id', 'USERID');
+    }
+
+    public function pivot_vice_manager(): HasOne
+    {
+        return $this->hasOne(UserManager::class, 'vice_manager_id', 'USERID');
     }
 }
