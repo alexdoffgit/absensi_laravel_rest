@@ -3,13 +3,13 @@
 namespace App\Rules\LeaveSubmission;
 
 use Closure;
+use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class DateRangeRule implements ValidationRule
+class DateRangeRule implements ValidationRule, DataAwareRule
 {
     private $minLeaveDayInterval = 3;
-    private $today = new \DateTimeImmutable();
-    // private $today = \DateTimeImmutable::createFromFormat('Y-m-d', '2023-01-01');
+    protected $data = [];
 
     /**
      * Run the validation rule.
@@ -25,7 +25,7 @@ class DateRangeRule implements ValidationRule
         }
         $validDateRange = $this->validateDateStartAndDateEnd($date['start'], $date['end']);
         if (!$validDateRange) {
-            $fail(__('leave-submission.invalid-date-start'));
+            $fail(__('leave-submission.invalid-date-range'));
         }
     }
 
@@ -49,7 +49,8 @@ class DateRangeRule implements ValidationRule
 
     private function validateDateStart(\DateTimeInterface $dateStart): bool
     {
-        $dayInteval = intval($this->today->diff($dateStart)->format("%a"));
+        $requestDate = \DateTimeImmutable::createFromFormat('Y-m-d', $this->data['request_date']);
+        $dayInteval = intval($requestDate->diff($dateStart)->format("%a"));
         return $dayInteval >= $this->minLeaveDayInterval;
     }
 
@@ -58,5 +59,11 @@ class DateRangeRule implements ValidationRule
         \DateTimeInterface $dateEnd): bool {
             $dateIntervalSymbol = $dateStart->diff($dateEnd)->format("%R");
             return $dateIntervalSymbol == '+';
+    }
+
+    public function setData(array $data)
+    {
+        $this->data = $data;
+        return $this;
     }
 }
