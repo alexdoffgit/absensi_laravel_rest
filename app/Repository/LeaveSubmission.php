@@ -2,98 +2,60 @@
 
 namespace App\Repository;
 
+use App\Exceptions\ManagerNotFoundException;
 use App\Interfaces\LeaveSubmission as ILeaveSubmission;
+use App\Models\Absence;
+use App\Models\AbsenceApproval;
+use App\Models\LeaveClass;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Models\UserManager;
 
 class LeaveSubmission implements ILeaveSubmission
 {
-    public function create($karyawanId, $requestData)
+    public function create($leaveSubmissionFormData)
     {
-        DB::transaction(function() use ($karyawanId, $requestData) {
-            $tableData = [
-                'user_id' => $karyawanId,
-                'alasan' => $requestData['alasan'],
-                'leaveclass_id' => $requestData['tipe_izin'],
-                'tanggal_pengajuan' => $requestData['tanggal_pengajuan'],
-                'tanggal_mulai' => $requestData['tanggal_mulai'],
-                'tanggal_selesai' => $requestData['tanggal_selesai'],
-                'dokumen_pendukung' => isset($requestData['dokumen_pendukung']) ? $requestData['dokumen_pendukung'] : null 
+        DB::transaction(function() use ($leaveSubmissionFormData) {
+    
+            $absence = Absence::create($leaveSubmissionFormData);
+    
+            $manager = $this->getManagerIdAndName($leaveSubmissionFormData['user_id']);
+
+            $absenceApprovalManager = [
+                'absence_id' => $absence->id,
+                'approver_user_id' => $manager['id'],
             ];
-    
-            $absensiId = DB::table('absensi')->insertGetId($tableData);
-    
-            $listAtasan = $this->getListAtasanId($karyawanId, $requestData['atasan_id']);
-    
-            $dataPenyetujuAbsen = [];
-    
-            foreach ($listAtasan as $value) {
-                $satuPenyetuju = [
-                    'absensi_id' => $absensiId,
-                    'penanggungjawab_id' => $value,
-                    'tanggal_pembuatan' => $tableData['tanggal_pengajuan']
-                ];
-    
-                $dataPenyetujuAbsen[] = $satuPenyetuju;
-            }
     
             $hrId = 54;
-            $userinfoHR = DB::table('userinfo')
-                ->select('USERID')
-                ->where('DEFAULTDEPTID', '=', $hrId)
-                ->first();
-            $hrPenyetujuAbsen = [
-                'absensi_id' => $absensiId,
-                'penanggungjawab_id' => $userinfoHR->USERID,
-                'tanggal_pembuatan' => $tableData['tanggal_pengajuan']
-            ];
-            $dataPenyetujuAbsen[] = $hrPenyetujuAbsen;
 
-            DB::table('penyetuju_absensi')->insert($dataPenyetujuAbsen);
+            $userinfoHR = User::where('DEFAULTDEPTID', '=', $hrId)
+            ->select(['USERID'])
+            ->first();
+            
+            $absenceApprovalHR = [
+                'absence_id' => $absence->id,
+                'approver_user_id' => $userinfoHR->USERID,
+            ];
+
+            AbsenceApproval::create($absenceApprovalManager);
+            AbsenceApproval::create($absenceApprovalHR);
         });
 
     }
 
-    private function getListAtasanId($karyawanId, $firstAtasan)
+    public function getManagerIdAndName($employeeId)
     {
-        $karyawanDepartment = DB::table('userinfo')->select(['DEFAULTDEPTID'])->where('USERID', '=', $karyawanId)->first();
-        $listAtasanId = [$firstAtasan];
-
-        if(!empty($karyawanDepartment)) {
-            $listDepartment = $this->getDepartmentChain($karyawanDepartment->DEFAULTDEPTID);
-        }
-
-        if(isset($listDepartment)) {
-            if(count($listDepartment) > 1) {
-                for($i = 1; $i < count($listDepartment) - 1; $i++) {
-                    $userInfoAtasan = DB::table('userinfo')
-                        ->select(['USERID'])
-                        ->where('DEFAULTDEPTID', '=', $listDepartment[$i])
-                        ->first();
-                    
-                    if(!empty($userInfoAtasan)) {
-                        $listAtasanId[] = $userInfoAtasan->USERID;
-                    }
-                }
-            }
-        }
-        return $listAtasanId;
-    }
-
-    private function getDepartmentChain($id)
-    {
-        $departmentParentList = [];
-        $currDept = $id;
-        while($currDept != 1) {
-            $dbTable = DB::table('departments')
-            ->select(['SUPDEPTID'])
-            ->where('DEPTID', '=', $currDept)
+        // TODO: implement this feature based on date and leave
+        $userManager = UserManager::where('user_id', '=', $employeeId)
             ->first();
-            
-            $currDept = $dbTable->SUPDEPTID;
-            $departmentParentList[] = $currDept;
+        if (empty($userManager)) {
+            throw new ManagerNotFoundException($employeeId);
         }
-        array_pop($departmentParentList);
-        return $departmentParentList;
+
+        return [
+            'id' => $userManager->head_manager->USERID,
+            'name' => $userManager->head_manager->fullname
+        ];
     }
 
     public function persetujuanIzin($status, $atasanid, $listizinid)
@@ -106,30 +68,16 @@ class LeaveSubmission implements ILeaveSubmission
             ]);
     }
 
-    public function tipeIzin()
+    public function getLeaveIdsAndTypes()
     {
-        $tabelLeaveClass = DB::table('leaveclass')
-            ->select(['LEAVEID', 'LEAVENAME'])
-            ->get();
-        return $tabelLeaveClass;
-    }
-
-    public function getAtasanByKaryawanId($id)
-    {
-        // TODO: cari siapa yang akan setuju kalau user tidak ada
-        $userinfoTable = DB::table('userinfo')
-            ->select('DEFAULTDEPTID')
-            ->where('USERID', '=', $id)
-            ->first();
-        $departmentTable = DB::table('departments')
-            ->select('SUPDEPTID')
-            ->where('DEPTID', '=', $userinfoTable->DEFAULTDEPTID)
-            ->first();
-        $userinfoAtasanTable = DB::table('userinfo')
-            ->select('USERID', 'fullname')
-            ->where('DEFAULTDEPTID', '=', $departmentTable->SUPDEPTID)
-            ->get();
-
-        return $userinfoAtasanTable;
+        $leaves = LeaveClass::select(['LEAVEID', 'LEAVENAME'])
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->LEAVEID,
+                    'type' => $item->LEAVENAME
+                ];
+            });
+        return $leaves;
     }
 }

@@ -4,63 +4,95 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Interfaces\LeaveSubmission;
+use App\Rules\LeaveSubmission\DateRangeRule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class LeaveSubmissionController extends Controller
 {
-    public function __construct(private LeaveSubmission $store) { }
+    public function __construct(private LeaveSubmission $leaveSubmissionStore) { }
 
-    public function createView(Request $request) {
+    public function create(Request $request) {
         $karyawanid = Auth::user()->USERID;
 
         return view('leave-submission', [
             'karyawanId' => $karyawanid,
-            'semuaIzin' => $this->store->tipeIzin(),
-            'semuaAtasan' => $this->store->getAtasanByKaryawanId($karyawanid)
+            'semuaIzin' => $this->leaveSubmissionStore->tipeIzin(),
+            'semuaAtasan' => $this->leaveSubmissionStore->getAtasanByKaryawanId($karyawanid)
         ]);
     }
 
-    public function createWeb(Request $request, $karyawanid) {
+    public function store(Request $request) {
         $data = $request->validate([
-            'tanggal_pengajuan' => 'required|date_format:Y-m-d',
-            'daterange' => 'required|date_format:Y-m-d',
-            'selesai_izin' => 'required|date_format:Y-m-d',
-            'atasan' => 'numeric',
-            'izin' => 'numeric',
-            'alasan' => 'nullable',
-            'dokumen' => 'nullable|file|mimes:pdf|max:10240'
+            'request_date' => 'required|date_format:Y-m-d',
+            'daterange' => [new DateRangeRule],
+            'manager_id' => 'numeric',
+            'leave_id' => 'numeric',
+            'reason' => 'nullable',
+            'document' => 'nullable|file|mimes:pdf|max:10240'
         ]);
 
-        if($request->hasFile('dokumen')) {
-            $filePath = null;
-            $filePath = $request->file('dokumen')->store('uploads', 'public');
-            $inDatabase = [
-                'tanggal_pengajuan' => $data['tanggal_pengajuan'],
-                'tanggal_mulai' => $data['mulai_izin'],
-                'tanggal_selesai' => $data['selesai_izin'],
-                'atasan_id' => $data['atasan'],
-                'tipe_izin' => $data['izin'],
-                'alasan' => $data['alasan'],
-                'dokumen_pendukung' => $filePath
-            ];
+        if($request->hasFile('document')) {
+            $filePath = $request->file('document')->store('uploads', 'public');
+            $data['document_path'] = $filePath;
+            $this->storeLeaveSubmissionWithFile($data);
         } else {
-            $inDatabase = [
-                'tanggal_pengajuan' => $data['tanggal_pengajuan'],
-                'tanggal_mulai' => $data['mulai_izin'],
-                'tanggal_selesai' => $data['selesai_izin'],
-                'atasan_id' => $data['atasan'],
-                'tipe_izin' => $data['izin'],
-                'alasan' => $data['alasan'],
-            ];
+            $this->storeLeaveSubmission($data);
         }
-        
-        $this->store->create(intval($karyawanid), $inDatabase);
 
-        return redirect()->back();
+        return redirect('/leave-submission');
     }
 
-    public function create(Request $request, string $karyawanname) {
+    private function storeLeaveSubmissionWithFile($validatedRequestData)
+    {
+        $uid = Auth::user()->USERID;
+        $dateRange = $this->getDateRangeFromString($validatedRequestData['daterange']);
+        $formData = [
+            'user_id' => $uid,
+            'reason' => $validatedRequestData['reason'],
+            'leaveclass_id' => $validatedRequestData['leave_id'],
+            'submission_date' => $validatedRequestData['request_date'],
+            'date_start' => $dateRange['start'],
+            'date_end' => $dateRange['end'],
+            'supporting_document' => $validatedRequestData['document_path'] 
+        ];
+        $this->leaveSubmissionStore->create($formData);
+    }
+
+    private function storeLeaveSubmission($validatedRequestData)
+    {
+        $uid = Auth::user()->USERID;
+        $dateRange = $this->getDateRangeFromString($validatedRequestData['daterange']);
+        $formData = [
+            'user_id' => $uid,
+            'reason' => $validatedRequestData['reason'],
+            'leaveclass_id' => $validatedRequestData['leave_id'],
+            'submission_date' => $validatedRequestData['request_date'],
+            'date_start' => $dateRange['start'],
+            'date_end' => $dateRange['end'],
+        ];
+        $this->leaveSubmissionStore->create($formData);
+    }
+
+    /**
+     * @param mixed $value
+     * @return array{
+     *   'start': \DateTimeInterface,
+     *   'end': \DateTimeInterface
+     * }
+     */
+    private function getDateRangeFromString($dateRangeString) 
+    {
+        $dateRange = explode(" - ", $dateRangeString);
+        $dateStart = \DateTimeImmutable::createFromFormat('Y-m-d', $dateRange[0]);
+        $dateEnd = \DateTimeImmutable::createFromFormat('Y-m-d', $dateRange[1]);
+        return [
+            'start' => $dateStart,
+            'end' => $dateEnd
+        ];
+    }
+
+    public function createApi(Request $request, string $karyawanname) {
         $tanggalPengajuan = $request->input("tanggal_pengajuan");
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
@@ -79,12 +111,12 @@ class LeaveSubmissionController extends Controller
             'alasan' => $alasan
         ];
 
-        $isSuccess = $this->store->create($karyawan->USERID, $internalData);
+        $isSuccess = $this->leaveSubmissionStore->create($karyawan->USERID, $internalData);
     }
 
     public function persetujuanIzin(Request $request, string $atasanid, string $listizinid)
     {
         $status = intval($request->input('accrej'));
-        $this->store->persetujuanIzin($status, intval($atasanid), intval($listizinid));
+        $this->leaveSubmissionStore->persetujuanIzin($status, intval($atasanid), intval($listizinid));
     }
 }
