@@ -30,12 +30,10 @@ class Authentication implements IAuth
             return false;
         }
     }
-
-    // TODO: not use plain text to store password
-    // TODO: rehash the password in db
     public function register($username, $textPassword)
     {
-        $id = DB::table('userinfo')->insertGetId(['Name' => $username, 'PASSWORD' => $textPassword]);
+        $password = Hash::make($textPassword);
+        $id = DB::table('userinfo')->insertGetId(['Name' => $username, 'PASSWORD' => $password]);
         return $id;
     }
 }
