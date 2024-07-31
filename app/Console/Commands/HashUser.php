@@ -27,13 +27,13 @@ class HashUser extends Command
      */
     public function handle()
     {
-        $fullname = 'BACHROAN';
+        $fullname = 'SUHARJO';
         $userinfo = DB::table('userinfo')
             ->where('fullname', '=', $fullname)
             ->first();
         if (Hash::needsRehash($userinfo->password)) {
             DB::table('userinfo')
-                ->where('fullname', '=', 'BACHROAN')
+                ->where('fullname', '=', $fullname)
                 ->update(['password' => Hash::make($userinfo->password)]);
 
             $this->info("Password rehashed for user: {$userinfo->fullname}");
