@@ -5,10 +5,18 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Database\Seeders\UserSeeder;
 
 class LoginTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(UserSeeder::class);
+    }
+
     /**
      * A basic feature test example.
      */
