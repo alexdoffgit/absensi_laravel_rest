@@ -11,7 +11,7 @@ const todayDate = () => {
     return formattedDate;
 };
 
-let tanggalPengajuanEl = $("#tanggal_pengajuan");
+let tanggalPengajuanEl = $("#request_date");
 
 if (tanggalPengajuanEl) {
     tanggalPengajuanEl.val(todayDate())
