@@ -1,4 +1,12 @@
-<div class="bg-dark py-3">
+<div class="bg-dark py-3 d-flex justify-content-between align-items-center">
+    <span>
+        <a 
+         href="/" 
+         style="text-decoration: none" 
+         class="text-danger mx-4 fw-bold fs-5">
+            wonokoyo
+        </a>
+    </span>
     <ul class="nav justify-content-end">
         <li class="nav-item">
             <a href="#" class="d-block text-decoration-none text-white nav-link">
