@@ -6,13 +6,27 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Repository\Employee;
+use Database\Seeders\DepartmentSeeder;
+use Database\Seeders\DeptSeqSeeder;
+use Database\Seeders\UserSeeder;
 
 class UserRoleTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        $this->seed([
+            UserSeeder::class,
+            DepartmentSeeder::class,
+            DeptSeqSeeder::class
+        ]);
+    }
+
     /**
      * A basic feature test example.
      */
-    public function return_the_correct_roles(): void
+    public function test_return_the_correct_roles(): void
     {
         // arrange
         $userHR = 3;
