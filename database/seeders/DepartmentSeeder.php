@@ -15,6 +15,5 @@ class DepartmentSeeder extends Seeder
     {
         $deptartmentSQLFilePath = database_path('seeders/departments.sql');
         DB::unprepared(file_get_contents($deptartmentSQLFilePath));
-        $this->command->info('departments seeded');
     }
 }

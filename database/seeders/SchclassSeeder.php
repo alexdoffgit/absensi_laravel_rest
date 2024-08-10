@@ -15,6 +15,5 @@ class SchclassSeeder extends Seeder
     {
         $schclassSQLFileInfo = database_path('seeders/schclass.sql');
         DB::unprepared(file_get_contents($schclassSQLFileInfo));
-        $this->command->info('schclass seeded');
     }
 }

@@ -15,6 +15,5 @@ class UserSpedaySeeder extends Seeder
     {
         $userSpedayFilePath = database_path('seeders/user_speday.sql');
         DB::unprepared(file_get_contents($userSpedayFilePath));
-        $this->command->info('user speday seeded');
     }
 }

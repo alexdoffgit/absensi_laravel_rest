@@ -15,6 +15,5 @@ class UserSchSeeder extends Seeder
     {
         $userSchSQLFilePath = database_path('seeders/user_sch.sql');
         DB::unprepared(file_get_contents($userSchSQLFilePath));
-        $this->command->info('user sch seeded');
     }
 }

@@ -17,7 +17,6 @@ class UserSeeder extends Seeder
         $users = $this->createUsers();
         DB::table('userinfo')
             ->insert($users);
-        $this->command->info('userinfo seeded');
     }
 
     private function createUsers()

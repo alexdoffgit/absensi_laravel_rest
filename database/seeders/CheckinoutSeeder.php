@@ -15,6 +15,5 @@ class CheckinoutSeeder extends Seeder
     {
         $checkinoutSQLFilePath = database_path('seeders/checkinout.sql');
         DB::unprepared(file_get_contents($checkinoutSQLFilePath));
-        $this->command->info('checkinout seeded');
     }
 }

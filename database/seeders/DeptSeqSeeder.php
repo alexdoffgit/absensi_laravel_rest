@@ -15,6 +15,5 @@ class DeptSeqSeeder extends Seeder
     {
         $deptseqSQLFilePath = database_path('seeders/deptseq.sql');
         DB::unprepared(file_get_contents($deptseqSQLFilePath));
-        $this->command->info('deptseq seeded');
     }
 }

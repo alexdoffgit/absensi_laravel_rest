@@ -15,6 +15,5 @@ class LeaveclassSeeder extends Seeder
     {
         $leaveclassSQLFilePath = database_path('seeders/leaveclass.sql');
         DB::unprepared(file_get_contents($leaveclassSQLFilePath));
-        $this->command->info('leaveclass seeded');
     }
 }
