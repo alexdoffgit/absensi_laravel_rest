@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leave_allowance');
+        Schema::dropIfExists('leave_allowances');
     }
 };
