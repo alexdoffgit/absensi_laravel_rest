@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('schclass', function (Blueprint $table) {
-            $table->integer('schclassid')->primary();
+            $table->integer('schclassid')->primary()->autoIncrement();
             $table->string('SCHNAME', 50);
             $table->time('STARTTIME')->nullable();
             $table->time('ENDTIME')->nullable();
