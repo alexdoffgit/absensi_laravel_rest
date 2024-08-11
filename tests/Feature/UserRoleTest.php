@@ -16,6 +16,7 @@ class UserRoleTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->seed([
             UserSeeder::class,
             DepartmentSeeder::class,
@@ -29,9 +30,9 @@ class UserRoleTest extends TestCase
     public function test_return_the_correct_roles(): void
     {
         // arrange
-        $userHR = 3;
-        $usersManager = [54, 215, 117];
-        $userStaff = 971;
+        $userHR = 1;
+        $usersManager = [10, 7];
+        $userStaff = 6;
         // act
         $k = new Employee();
         $roleHR = $k->getRoles($userHR);
