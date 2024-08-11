@@ -3,11 +3,13 @@
 namespace App\Repository;
 
 use App\Exceptions\EmployeeNotFoundException;
+use App\Exceptions\InvalidPasswordException;
 use App\Interfaces\Employee as IEmployee;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use DateTimeImmutable;
 use DateInterval;
+use Illuminate\Support\Facades\Hash;
 
 class Employee implements IEmployee
 {
@@ -165,6 +167,78 @@ class Employee implements IEmployee
         });
 
         return $user->toArray();
+    }
+
+    /**
+     * @param array{
+     *   badgenumber: string,
+     *   ssn: string,
+     *   fullname: string,
+     *   text_password: string,
+     *   department_id: int
+     * } $employeeData
+     * @return \App\Models\User
+     * @throws \Illuminate\Database\QueryException
+     */
+    public function insertEmployee($employeeData)
+    {
+        $user = new User();
+        $user->Badgenumber = $employeeData['badgenumber'];
+        $user->SSN = $employeeData['ssn'];
+        $user->fullname = $employeeData['fullname'];
+        $user->password = Hash::make($employeeData['text_password']);
+        $user->DEFAULTDEPTID = $employeeData['department_id'];
+        $user->save();
+
+        return $user;
+    }
+
+    /**
+     * @param array{
+     *   id: int,
+     *   badgenumber: string|null,
+     *   ssn: string|null,
+     *   fullname: string|null,
+     *   text_password: string|null,
+     *   department_id: int|null
+     * } $employeeData
+     * @return \App\Models\User
+     * @throws \Illuminate\Database\QueryException
+     * @throws \App\Exceptions\InvalidPasswordException
+     */
+    public function updateEmployee($employeeData)
+    {
+        if (!empty($employeeData['text_password'])) {
+            $userForPassword = User::find($employeeData['id']);
+            if (!Hash::check($employeeData['text_password'], $userForPassword->password)) {
+                throw new InvalidPasswordException();
+            }
+        }
+
+        return DB::transaction(function() use ($employeeData) {
+            $user = User::find($employeeData['id']);
+
+            User::where('USERID', '=', $employeeData['id'])
+                ->update([
+                    'Badgenumber' => $employeeData['badgenumber'] ?? $user->Badgenumber,
+                    'SSN' => $employeeData['ssn'] ?? $user->SSN,
+                    'fullname' => $employeeData['fullname'] ?? $user->fullname,
+                    'DEFAULTDEPTID' => $employeeData['department_id'] ?? $user->DEFAULTDEPTID
+                ]);
+
+            return User::find($employeeData['id']);
+        });
+    }
+
+    /**
+     * @param int @id
+     * @return void
+     * @throws \Illuminate\Database\QueryException
+     */
+    public function deleteEmployee($id)
+    {
+        $user = User::find($id);
+        $user->delete();
     }
 
     /**
