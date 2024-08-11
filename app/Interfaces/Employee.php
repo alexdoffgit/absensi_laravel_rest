@@ -14,4 +14,16 @@ interface Employee
      * @throws App\Exceptions\EmployeeNotFoundException
      */
     public function getRoles($uid);
+
+
+    /**
+     * @return list<array{
+     *   user_id: int,
+     *   badgenumber: string,
+     *   fullname: string,
+     *   ssn: string,
+     *   department_name: string
+     * }>
+     */
+    public function findAllForHR();
 }

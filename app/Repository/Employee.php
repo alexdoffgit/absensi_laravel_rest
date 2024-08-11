@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Exceptions\EmployeeNotFoundException;
 use App\Interfaces\Employee as IEmployee;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use DateTimeImmutable;
 use DateInterval;
@@ -138,6 +139,32 @@ class Employee implements IEmployee
     {
         $jabatan = DB::table('jabatan')->select('atasan_id')->where('user_id', '=', $karyawanId)->first();
         return $jabatan->atasan_id;
+    }
+
+    /**
+     * @return list<array{
+     *   user_id: int,
+     *   badgenumber: string,
+     *   fullname: string,
+     *   ssn: string,
+     *   department_name: string
+     * }>
+     */
+    public function findAllForHR()
+    {
+        $user = User::all();
+
+        $user->transform(function($item) {
+            return [
+                'user_id' => $item->USERID,
+                'badgenumber' => $item->Badgenumber,
+                'fullname' => $item->fullname,
+                'ssn' => $item->SSN,
+                'department_name' => $item->department->DEPTNAME
+            ];
+        });
+
+        return $user->toArray();
     }
 
     /**
