@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Services;
 use \DateTimeImmutable;
 use \DateInterval;
 use App\Interfaces\TimeHelper as ITimeHelper;
