@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Exceptions\InvalidPasswordException;
-use App\Repository\Employee;
+use App\Repository\Database\Employee;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
