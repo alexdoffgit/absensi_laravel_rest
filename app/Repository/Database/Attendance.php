@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Database;
 
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\Attendance as IAttendance;

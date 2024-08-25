@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Database;
 
 use App\Exceptions\ManagerNotFoundException;
 use App\Interfaces\LeaveSubmission as ILeaveSubmission;

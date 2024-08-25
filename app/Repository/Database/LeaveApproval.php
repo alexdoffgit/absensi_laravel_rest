@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Database;
 
 use App\Interfaces\LeaveApproval as ILeaveApproval;
 use Illuminate\Support\Facades\DB;
