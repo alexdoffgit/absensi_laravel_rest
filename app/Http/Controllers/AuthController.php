@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Interfaces\Authentication;
-use App\Interfaces\Employee;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 class AuthController extends Controller
 {
     public function __construct(
-        private Authentication $au,
-        private Employee $employee
+        private Authentication $au
     ) {
     }
 
