@@ -5,33 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <style>
-    .simple-container {
-        display: grid;
-        place-items: center;
-        height: 100vh;
-    }
-    .formbox {
-        width: 45%;
-        padding: 2em;
-        padding-top: 1em;
-        border: 1px solid lightgray;
-        border-radius: 20px;
-    }
-    .formbox > h1 {
-        text-align: center;
-    }
-    .formbox > form label {
-        margin-top: 2em;
-    }
-    .formbox > form button {
-        margin-top: 2em;
-    }
-    #toggle-password {
-        cursor: pointer;
-    }
 </style>
 <body>
     @if (session('invalid'))    
